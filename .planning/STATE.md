@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-25T23:38:50.434Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-03-25T23:44:15.744Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 01 (architecture-foundation-and-data-layer) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Plan: 2 of 3
 
 *Updated after each plan completion*
 | Phase 01 P01 | 4min | 2 tasks | 16 files |
+| Phase 01 P03 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,8 @@ Recent decisions affecting current work:
 - [Roadmap]: Web Worker and PWA deferred to Phase 4 (need scoring pipeline to exist before optimizing it)
 - [Phase 01]: Used --legacy-peer-deps for vite-plugin-pwa 1.2.0 with Vite 8 (peer declares max Vite 7 but works fine)
 - [Phase 01]: Leaflet imported from npm (bundled by Vite) rather than CDN for offline PWA support
+- [Phase 01]: Direct fetch() for ORS and OSRM instead of client libraries -- simpler, fewer deps
+- [Phase 01]: OSRM normalizes to GeoJSON FeatureCollection to match ORS native format -- uniform output
 
 ### Pending Todos
 
@@ -72,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T23:38:50.428Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-03-25T23:44:15.738Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None

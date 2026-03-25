@@ -34,8 +34,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Vite project scaffold, core infrastructure (EventBus, State, Config, Cache), Leaflet map
-- [ ] 01-02-PLAN.md -- Overpass adapter, comprehensive query builder, region-adaptive profiles
-- [ ] 01-03-PLAN.md -- ORS/OSRM routing adapters, EngineManager fallback chain
+- [x] 01-02-PLAN.md -- Overpass adapter, comprehensive query builder, region-adaptive profiles
+- [x] 01-03-PLAN.md -- ORS/OSRM routing adapters, EngineManager fallback chain
 
 ### Phase 2: Route Building and Scoring Engine
 **Goal**: Users can generate high-quality loop routes at a requested distance, receive multiple ranked candidates, and trust that routes prefer trails and quality surfaces over roads
