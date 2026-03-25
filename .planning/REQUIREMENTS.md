@@ -33,10 +33,10 @@
 
 ### Architecture
 
-- [ ] **ARCH-01**: Codebase restructured from single index.html into ES Module architecture with clear component boundaries
+- [x] **ARCH-01**: Codebase restructured from single index.html into ES Module architecture with clear component boundaries
 - [ ] **ARCH-02**: App functions as an offline-capable PWA with service worker and app manifest
 - [ ] **ARCH-03**: Scoring pipeline runs in a Web Worker to prevent UI blocking during route generation
-- [ ] **ARCH-04**: Trail data cached in IndexedDB to reduce redundant Overpass API calls and improve response time
+- [x] **ARCH-04**: Trail data cached in IndexedDB to reduce redundant Overpass API calls and improve response time
 
 ### Global Validation
 
@@ -81,8 +81,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-01 | Phase 1 | Pending |
-| ARCH-04 | Phase 1 | Pending |
+| ARCH-01 | Phase 1 | Complete |
+| ARCH-04 | Phase 1 | Complete |
 | DATA-01 | Phase 1 | Pending |
 | DATA-02 | Phase 1 | Pending |
 | DATA-05 | Phase 1 | Pending |

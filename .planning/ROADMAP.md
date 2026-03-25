@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Vite project scaffold, core infrastructure (EventBus, State, Config, Cache), Leaflet map
+- [x] 01-01-PLAN.md -- Vite project scaffold, core infrastructure (EventBus, State, Config, Cache), Leaflet map
 - [ ] 01-02-PLAN.md -- Overpass adapter, comprehensive query builder, region-adaptive profiles
 - [ ] 01-03-PLAN.md -- ORS/OSRM routing adapters, EngineManager fallback chain
 
