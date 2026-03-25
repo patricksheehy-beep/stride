@@ -30,12 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Routing requests go through ORS foot-hiking profile with OSRM as automatic fallback when ORS fails or is rate-limited
   4. Repeated requests for the same area load trail data from IndexedDB cache instead of re-querying Overpass
   5. Trail discovery works correctly in both US-style and Japan-style OSM tagging conventions without manual configuration
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md -- Vite project scaffold, core infrastructure (EventBus, State, Config, Cache), Leaflet map
+- [ ] 01-02-PLAN.md -- Overpass adapter, comprehensive query builder, region-adaptive profiles
+- [ ] 01-03-PLAN.md -- ORS/OSRM routing adapters, EngineManager fallback chain
 
 ### Phase 2: Route Building and Scoring Engine
 **Goal**: Users can generate high-quality loop routes at a requested distance, receive multiple ranked candidates, and trust that routes prefer trails and quality surfaces over roads
