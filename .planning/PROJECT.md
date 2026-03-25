@@ -12,18 +12,18 @@ Every generated route should feel like a local runner recommended it — hitting
 
 ### Validated
 
-(None yet — ship to validate)
+- Codebase restructured from single index.html into modular ES Module architecture — Validated in Phase 1
+- Overpass queries find all relevant trails, paths, and runnable routes near the user — Validated in Phase 1
+- ORS foot-hiking routing with OSRM fallback — Validated in Phase 1
 
 ### Active
 
-- [ ] Overpass queries find all relevant trails, paths, and runnable routes near the user — not just a subset
-- [ ] Scoring formula surfaces the best routes, not just the closest or longest
+- [ ] Scoring formula surfaces the best routes, not just the closest or longest (pending Phase 2)
 - [ ] All three routing modes (Trail, Sightseeing, Streets-OK) produce high-quality results globally
 - [ ] Route generation works across any terrain type — urban, suburban, rural, mountain
 - [ ] Multiple data sources layered (OSM + Strava heatmaps + Google/Apple Maps) to fill gaps where any single source has sparse data
 - [ ] No unrunnable routes — no dead ends, zig-zags, or road-heavy paths when trails exist
 - [ ] Distance accuracy — requested distance matches actual route distance
-- [ ] Codebase restructured from single index.html into modular architecture to support multi-source complexity
 
 ### Out of Scope
 
@@ -35,7 +35,7 @@ Every generated route should feel like a local runner recommended it — hitting
 
 ## Context
 
-- **Current state:** Working prototype as a single `index.html` (~1100 lines) hosted on GitHub Pages. Two routing modes: algorithmic Trail mode (Overpass → score → build out-and-back) and AI-powered Sightseeing/Streets mode (Claude selects waypoints). Trail mode uses `connectSegments()` to stitch OSM way fragments within 300m gaps.
+- **Current state:** Phase 1 complete — modular ES Module architecture with Vite, core infrastructure (EventBus, State, Config, Cache), Leaflet map, comprehensive Overpass trail discovery (8 highway types, 4 route relation types, region-adaptive for US/Europe/Japan), and dual routing engine (ORS foot-hiking + OSRM fallback). 92 tests passing.
 - **Known issues:** OSM trail segments are fragmented (e.g., Bay Trail: 88 segments, 15km gaps). Overpass queries miss some trail types. Scoring formula over-weights proximity and under-weights route quality signals. OSRM's foot profile biases toward roads over trails. Works reasonably in Sunnyvale/Bay Area but untested globally.
 - **Data sources today:** Overpass (OSM) for trail geometry, ORS for foot-hiking routing + elevation, OSRM as fallback, Claude for sightseeing waypoint selection, Nominatim for geocoding, Wikipedia for nearby photos.
 - **Target data sources:** Add Strava heatmaps (where runners actually run), Google/Apple Maps (parks, paths, POIs) to supplement OSM and fill gaps in data-sparse regions.
@@ -74,4 +74,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after initialization*
+*Last updated: 2026-03-25 after Phase 1 completion*
