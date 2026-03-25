@@ -119,7 +119,7 @@ describe('EngineManager', () => {
     const cached = await getCached(ROUTE_STORE, cacheKey);
     expect(cached).toBeTruthy();
     expect(cached.engine).toBe('ors');
-    expect(cached.route).toBe(orsResult);
+    expect(cached.route).toEqual(orsResult);
   });
 
   it('returns cached result without calling adapters', async () => {
