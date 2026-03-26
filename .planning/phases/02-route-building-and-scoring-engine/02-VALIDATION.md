@@ -38,10 +38,9 @@ created: 2026-03-25
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 2-01-01 | 01 | 1 | ROUTE-07 | unit | `npx vitest run tests/scoring/` | ❌ W0 | ⬜ pending |
-| 2-02-01 | 02 | 2 | ROUTE-01 | unit | `npx vitest run tests/route-builder/` | ❌ W0 | ⬜ pending |
-| 2-02-02 | 02 | 2 | ROUTE-02 | unit | `npx vitest run tests/route-builder/` | ❌ W0 | ⬜ pending |
-| 2-03-01 | 03 | 2 | ROUTE-03, ROUTE-04 | integration | `npx vitest run tests/generator/` | ❌ W0 | ⬜ pending |
+| 2-01-01 | 01 | 1 | ROUTE-04, ROUTE-07 | unit | `npx vitest run tests/scoring/` | ❌ W0 | ⬜ pending |
+| 2-02-01 | 02 | 2 | ROUTE-01, ROUTE-02 | unit | `npx vitest run tests/routing/` | ❌ W0 | ⬜ pending |
+| 2-03-01 | 03 | 3 | ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, ROUTE-07 | integration | `npx vitest run tests/routing/` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -50,8 +49,7 @@ created: 2026-03-25
 ## Wave 0 Requirements
 
 - [ ] `tests/scoring/` directory structure
-- [ ] `tests/route-builder/` directory structure
-- [ ] `tests/generator/` directory structure
+- [ ] `tests/routing/` directory structure (route-builder and generator tests)
 - [ ] Mock ORS/OSRM responses for deterministic testing
 
 ---
