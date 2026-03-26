@@ -47,12 +47,12 @@ Plans:
   3. User receives 3 or more route options ranked from best to worst for each request
   4. Routes visibly prefer trails, paths, and unpaved surfaces over roads when both are available nearby
   5. Each route has a multi-factor quality score incorporating surface quality, trail continuity, scenic value, and water/green proximity
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [ ] 02-01-PLAN.md -- Multi-factor scoring engine (surface, trail preference, continuity, scenic) with configurable region weights
+- [ ] 02-02-PLAN.md -- ORS round_trip support, RouteBuilder with loop generation, waypoint trail forcing, and distance refinement
+- [ ] 02-03-PLAN.md -- RouteGenerator pipeline integrating generation + scoring + ranking, wired to app state and EventBus
 
 ### Phase 3: Natural Language, Route Intelligence, and Data Enrichment
 **Goal**: Users can describe the run they want in plain English and receive routes that match, with explanations of why each route was chosen, powered by enriched data from multiple OSM signal types
@@ -109,8 +109,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Architecture Foundation and Data Layer | 0/3 | Not started | - |
-| 2. Route Building and Scoring Engine | 0/3 | Not started | - |
+| 1. Architecture Foundation and Data Layer | 3/3 | Complete | 2026-03-25 |
+| 2. Route Building and Scoring Engine | 0/3 | Planning complete | - |
 | 3. Natural Language, Route Intelligence, and Data Enrichment | 0/3 | Not started | - |
 | 4. Export, Map Experience, and PWA | 0/3 | Not started | - |
 | 5. Global Validation | 0/2 | Not started | - |
