@@ -1,7 +1,8 @@
 /**
- * System prompts and JSON schemas for NL parsing.
+ * System prompts and JSON schemas for NL parsing and route explanation.
  * Used by NLParser to convert user route descriptions
- * into structured weight adjustments and preferences.
+ * into structured weight adjustments and preferences,
+ * and by RouteExplainer to generate human-readable route explanations.
  */
 
 /**
@@ -65,3 +66,14 @@ export const WEIGHT_SCHEMA = {
   required: ['weights', 'preferences', 'vibeKeywords'],
   additionalProperties: false
 };
+
+/**
+ * System prompt for the route quality explainer.
+ * Instructs Claude to generate human-readable explanations
+ * of why a route was recommended, referencing specific details.
+ */
+export const EXPLAINER_SYSTEM_PROMPT = `You are a running route quality explainer for the Stride app. Given a route's scoring breakdown and trail metadata, write a concise 2-3 sentence explanation of why this route was recommended.
+
+Reference specific details: trail names, surface types, parks or water features nearby, and what makes the route good for running. Be enthusiastic but honest. If the route scores poorly on some factor, mention it briefly as a tradeoff.
+
+Write in second person ("You'll run along..."). Keep it under 100 words.`;
