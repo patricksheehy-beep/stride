@@ -72,3 +72,42 @@ export const REGION_WEIGHTS = {
 export function getWeightsForRegion(regionKey) {
   return REGION_WEIGHTS[regionKey] || DEFAULT_WEIGHTS;
 }
+
+/**
+ * Merge NL-derived weight adjustments with region-detected defaults.
+ * NL weights take priority for any key they specify. The result is
+ * normalized to sum to 1.0.
+ *
+ * If nlWeights is null, undefined, or an empty object, the region
+ * defaults are returned unchanged.
+ *
+ * @param {Object} regionWeights - Base weight profile from getWeightsForRegion()
+ * @param {Object|null|undefined} nlWeights - Weight overrides from NLParser (partial or full)
+ * @returns {Object} Merged and normalized weight profile (sums to 1.0)
+ */
+export function mergeWeights(regionWeights, nlWeights) {
+  // If NL weights are absent or empty, return a copy of region defaults
+  if (!nlWeights || typeof nlWeights !== 'object' || Object.keys(nlWeights).length === 0) {
+    return { ...regionWeights };
+  }
+
+  // Start with region defaults
+  const merged = { ...regionWeights };
+
+  // Override with NL-derived values where the key exists in both
+  for (const [key, value] of Object.entries(nlWeights)) {
+    if (key in merged && typeof value === 'number') {
+      merged[key] = value;
+    }
+  }
+
+  // Normalize to sum to 1.0
+  const sum = Object.values(merged).reduce((a, b) => a + b, 0);
+  if (sum > 0) {
+    for (const key of Object.keys(merged)) {
+      merged[key] = merged[key] / sum;
+    }
+  }
+
+  return merged;
+}
