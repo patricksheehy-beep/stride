@@ -12,7 +12,7 @@
 - [x] **ROUTE-03**: User receives 3+ route options ranked by quality for each request
 - [x] **ROUTE-04**: Routes are surface/terrain-aware -- preferring trails, paths, and unpaved surfaces when available
 - [x] **ROUTE-05**: User can describe desired route in natural language ("shady waterfront trail", "hilly forest run")
-- [ ] **ROUTE-06**: Each route includes a quality explanation -- why this route was chosen and what makes it good
+- [x] **ROUTE-06**: Each route includes a quality explanation -- why this route was chosen and what makes it good
 - [x] **ROUTE-07**: Multi-factor trail scoring ranks routes by green space proximity, water features, surface quality, trail continuity, and scenic value
 
 ### Data & Discovery
@@ -92,7 +92,7 @@
 | ROUTE-04 | Phase 2 | Complete |
 | ROUTE-07 | Phase 2 | Complete |
 | ROUTE-05 | Phase 3 | Complete |
-| ROUTE-06 | Phase 3 | Pending |
+| ROUTE-06 | Phase 3 | Complete |
 | DATA-03 | Phase 3 | Complete |
 | DATA-04 | Phase 3 | Complete |
 | EXPORT-01 | Phase 4 | Pending |
