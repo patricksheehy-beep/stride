@@ -37,6 +37,58 @@ export class RouteGenerator {
     this.overpassAdapter = overpassAdapter;
     this.nlParser = nlParser;
     this.routeExplainer = routeExplainer;
+    this._initWorker();
+  }
+
+  /**
+   * Initialize the scoring Web Worker for off-main-thread scoring.
+   * Gracefully degrades to null when Workers are unavailable (test env, SSR, etc.).
+   * @private
+   */
+  _initWorker() {
+    try {
+      this._worker = new Worker(
+        new URL('../scoring/scoring-worker.js', import.meta.url),
+        { type: 'module' }
+      );
+    } catch {
+      this._worker = null;
+    }
+  }
+
+  /**
+   * Score candidates in the Web Worker thread.
+   * Returns a Promise that resolves with the ranked results array.
+   * Rejects on worker error or 30-second timeout.
+   *
+   * @param {Array} candidates - Scoring candidates
+   * @param {number[]} startPoint - [lng, lat] or {lat, lng}
+   * @param {Object} weights - Scoring weight profile
+   * @returns {Promise<Array>} Ranked results from worker
+   * @private
+   */
+  _scoreInWorker(candidates, startPoint, weights) {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Worker scoring timed out after 30 seconds'));
+      }, 30000);
+
+      this._worker.onmessage = (e) => {
+        clearTimeout(timeout);
+        if (e.data && e.data.error) {
+          reject(new Error(e.data.error));
+        } else {
+          resolve(e.data);
+        }
+      };
+
+      this._worker.onerror = (err) => {
+        clearTimeout(timeout);
+        reject(err);
+      };
+
+      this._worker.postMessage({ candidates, startPoint, weights });
+    });
   }
 
   /**
@@ -151,8 +203,18 @@ export class RouteGenerator {
         throw new Error('No route candidates could be generated');
       }
 
-      // 7. Score and rank all candidates
-      const rankedResults = scorer.scoreAndRank(candidates, startPoint);
+      // 7. Score and rank all candidates (prefer Web Worker, fallback to main thread)
+      let rankedResults;
+      if (this._worker) {
+        try {
+          rankedResults = await this._scoreInWorker(candidates, startPoint, finalWeights);
+        } catch {
+          // Worker failed; fall back to main thread scoring
+          rankedResults = scorer.scoreAndRank(candidates, startPoint);
+        }
+      } else {
+        rankedResults = scorer.scoreAndRank(candidates, startPoint);
+      }
 
       // 8. Add distanceKm measurement to each result
       for (const result of rankedResults) {
