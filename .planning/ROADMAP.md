@@ -63,12 +63,12 @@ Plans:
   2. Each generated route includes a human-readable explanation of why it was chosen -- referencing trail names, landmarks, surface types, and scenic highlights
   3. Route scoring incorporates fused data from OSM trail geometry, route relations, land-use polygons, surface tags, and trail naming to approximate "where locals run"
   4. Green space scoring calculates proximity to parks, nature reserves, water bodies, and tree cover, and routes through green areas rank higher than equivalent road routes
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md -- Land-use data pipeline (Overpass polygon query + normalization) and green space scoring factor with 5-factor weight expansion
+- [ ] 03-02-PLAN.md -- Claude API client, NL parser (vibes to weight adjustments), and weight merging
+- [ ] 03-03-PLAN.md -- Route explanation generation and full pipeline integration (NL + green space + explanations wired into RouteGenerator)
 
 ### Phase 4: Export, Map Experience, and PWA
 **Goal**: The app is a production-ready PWA where users can export routes to GPS devices, view detailed route information on a responsive map, and use the app offline on mobile
@@ -111,6 +111,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Architecture Foundation and Data Layer | 3/3 | Complete | 2026-03-25 |
 | 2. Route Building and Scoring Engine | 0/3 | Planning complete | - |
-| 3. Natural Language, Route Intelligence, and Data Enrichment | 0/3 | Not started | - |
+| 3. Natural Language, Route Intelligence, and Data Enrichment | 0/3 | Planning complete | - |
 | 4. Export, Map Experience, and PWA | 0/3 | Not started | - |
 | 5. Global Validation | 0/2 | Not started | - |
