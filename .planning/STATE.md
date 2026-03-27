@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-03-27T00:18:41.680Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-27T13:48:33.357Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 02 (route-building-and-scoring-engine) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: 2 of 3
 | Phase 01 P01 | 4min | 2 tasks | 16 files |
 | Phase 01 P02 | 3min | 2 tasks | 6 files |
 | Phase 02 P01 | 35min | 2 tasks | 14 files |
+| Phase 02 P02 | 13min | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Trail preference weight highest at 0.30 -- directly addresses ROUTE-04 (prefer trails over roads)
 - [Phase 02]: Missing surface tags score as 0.5 neutral (not zero) to handle OSM data gaps in regions with sparse tagging
 - [Phase 02]: Region weight profiles: Japan boosts surface (reliable tagging), Europe boosts trailPreference (networks), US boosts continuity (sparse tagging)
+- [Phase 02]: ORS roundTrip uses single coordinate with round_trip parameters (length in meters, points=5, seed variation), mutually exclusive with alternative_routes
+- [Phase 02]: RouteBuilder early-returns when enough candidates collected (saves API calls while maintaining count+2 safety margin)
+- [Phase 02]: Waypoint snapping falls back to raw geometric position when no trail features available (handles data-sparse regions)
 
 ### Pending Todos
 
@@ -81,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T00:18:41.676Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-03-27T13:48:33.348Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

@@ -7,8 +7,8 @@
 
 ### Route Generation
 
-- [ ] **ROUTE-01**: User can generate loop routes (not just out-and-back) for a requested distance
-- [ ] **ROUTE-02**: Generated route distance matches requested distance within 10% accuracy
+- [x] **ROUTE-01**: User can generate loop routes (not just out-and-back) for a requested distance
+- [x] **ROUTE-02**: Generated route distance matches requested distance within 10% accuracy
 - [ ] **ROUTE-03**: User receives 3+ route options ranked by quality for each request
 - [x] **ROUTE-04**: Routes are surface/terrain-aware -- preferring trails, paths, and unpaved surfaces when available
 - [ ] **ROUTE-05**: User can describe desired route in natural language ("shady waterfront trail", "hilly forest run")
@@ -86,8 +86,8 @@
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |
 | DATA-05 | Phase 1 | Complete |
-| ROUTE-01 | Phase 2 | Pending |
-| ROUTE-02 | Phase 2 | Pending |
+| ROUTE-01 | Phase 2 | Complete |
+| ROUTE-02 | Phase 2 | Complete |
 | ROUTE-03 | Phase 2 | Pending |
 | ROUTE-04 | Phase 2 | Complete |
 | ROUTE-07 | Phase 2 | Complete |
