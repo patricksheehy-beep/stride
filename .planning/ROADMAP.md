@@ -96,11 +96,11 @@ Plans:
   1. A golden test set of 20+ locations across 3+ continents produces acceptable route quality, and this test set runs after every algorithm change
   2. Region-adaptive OSM tag handling automatically detects and adjusts for local tagging conventions (US vs Europe vs Japan vs others) without user intervention
   3. Route generation in data-sparse regions gracefully degrades with clear messaging rather than producing broken or unrunnable routes
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md -- Golden test fixtures, expanded region detection (South America, Africa, Oceania, Southeast Asia), and data quality analysis utility
+- [ ] 05-02-PLAN.md -- Golden test suite (region detection, query coverage, scoring validation) and data-sparse degradation in route generator
 
 ## Progress
 
@@ -113,4 +113,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Route Building and Scoring Engine | 0/3 | Planning complete | - |
 | 3. Natural Language, Route Intelligence, and Data Enrichment | 0/3 | Planning complete | - |
 | 4. Export, Map Experience, and PWA | 0/3 | Planning complete | - |
-| 5. Global Validation | 0/2 | Not started | - |
+| 5. Global Validation | 0/2 | Planning complete | - |
