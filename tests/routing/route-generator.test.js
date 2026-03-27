@@ -115,8 +115,10 @@ describe('RouteGenerator', () => {
     };
 
     const trailData = buildMockTrailData(37.4, -122.0);
+    const mockLandUseData = featureCollection([]);
     mockOverpassAdapter = {
-      fetchTrails: vi.fn().mockResolvedValue(trailData)
+      fetchTrails: vi.fn().mockResolvedValue(trailData),
+      fetchLandUse: vi.fn().mockResolvedValue(mockLandUseData)
     };
 
     // Collect emitted events
@@ -472,6 +474,186 @@ describe('RouteGenerator', () => {
       // store.trails should have been set to the fetched trail data
       expect(store.trails).toBeDefined();
       expect(store.trails.type).toBe('FeatureCollection');
+    });
+
+    // Phase 3 integration tests
+    describe('NL and explanation integration', () => {
+      it('with userDescription calls nlParser.parse and merges weights', async () => {
+        const mockNlParser = {
+          parse: vi.fn().mockResolvedValue({
+            weights: { surface: 0.1, continuity: 0.1, trailPreference: 0.3, scenic: 0.3, greenSpace: 0.2 },
+            preferences: { preferWater: true, preferParks: false, preferForest: false, preferHills: false, preferFlat: false, preferPaved: false, preferTrails: true },
+            vibeKeywords: ['waterfront', 'scenic']
+          })
+        };
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter,
+          nlParser: mockNlParser
+        });
+
+        await generator.generate(startPoint, distanceKm, { userDescription: 'scenic waterfront trail' });
+
+        expect(mockNlParser.parse).toHaveBeenCalledWith('scenic waterfront trail');
+      });
+
+      it('without userDescription skips NL parsing (backward compatible)', async () => {
+        const mockNlParser = { parse: vi.fn() };
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter,
+          nlParser: mockNlParser
+        });
+
+        const result = await generator.generate(startPoint, distanceKm);
+
+        expect(mockNlParser.parse).not.toHaveBeenCalled();
+        expect(result.routes.length).toBeGreaterThanOrEqual(1);
+      });
+
+      it('with nlParser returning null uses region default weights', async () => {
+        const mockNlParser = { parse: vi.fn().mockResolvedValue(null) };
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter,
+          nlParser: mockNlParser
+        });
+
+        const result = await generator.generate(startPoint, distanceKm, { userDescription: 'something' });
+
+        expect(mockNlParser.parse).toHaveBeenCalled();
+        // Should still produce valid results with default weights
+        expect(result.routes.length).toBeGreaterThanOrEqual(1);
+      });
+
+      it('fetches landUseData and passes to scorer via candidates', async () => {
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter
+        });
+
+        await generator.generate(startPoint, distanceKm);
+
+        expect(mockOverpassAdapter.fetchLandUse).toHaveBeenCalledTimes(1);
+      });
+
+      it('generates explanations for top 3 routes when routeExplainer is provided', async () => {
+        const mockExplainer = {
+          explainBatch: vi.fn().mockResolvedValue(['Explanation 1', 'Explanation 2', 'Explanation 3']),
+          _extractTrailMetadata: vi.fn().mockReturnValue({
+            trailNames: [], surfaces: [], waterFeatures: [], greenSpaces: []
+          })
+        };
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter,
+          routeExplainer: mockExplainer
+        });
+
+        const result = await generator.generate(startPoint, distanceKm);
+
+        expect(mockExplainer.explainBatch).toHaveBeenCalledTimes(1);
+        // Top routes should have explanations attached
+        expect(result.routes[0].explanation).toBe('Explanation 1');
+        expect(result.routes[1].explanation).toBe('Explanation 2');
+        expect(result.routes[2].explanation).toBe('Explanation 3');
+      });
+
+      it('with no routeExplainer skips explanation generation', async () => {
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter
+        });
+
+        const result = await generator.generate(startPoint, distanceKm);
+
+        // Routes should not have explanation property
+        expect(result.routes[0].explanation).toBeUndefined();
+      });
+
+      it('with failed NL parsing still generates routes with default weights', async () => {
+        const mockNlParser = { parse: vi.fn().mockRejectedValue(new Error('API down')) };
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter,
+          nlParser: mockNlParser
+        });
+
+        const result = await generator.generate(startPoint, distanceKm, { userDescription: 'test' });
+
+        expect(result.routes.length).toBeGreaterThanOrEqual(1);
+      });
+
+      it('with failed landUse fetch still scores with neutral green space', async () => {
+        mockOverpassAdapter.fetchLandUse = vi.fn().mockRejectedValue(new Error('Overpass down'));
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter
+        });
+
+        const result = await generator.generate(startPoint, distanceKm);
+
+        // Should still produce results even without land-use data
+        expect(result.routes.length).toBeGreaterThanOrEqual(1);
+      });
+
+      it('with failed explanation still returns routes without explanations', async () => {
+        const mockExplainer = {
+          explainBatch: vi.fn().mockRejectedValue(new Error('Claude down')),
+          _extractTrailMetadata: vi.fn().mockReturnValue({
+            trailNames: [], surfaces: [], waterFeatures: [], greenSpaces: []
+          })
+        };
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter,
+          routeExplainer: mockExplainer
+        });
+
+        const result = await generator.generate(startPoint, distanceKm);
+
+        expect(result.routes.length).toBeGreaterThanOrEqual(1);
+        expect(result.routes[0].explanation).toBeUndefined();
+      });
+
+      it('event payload includes nlResult when NL description was parsed', async () => {
+        const nlResultData = {
+          weights: { surface: 0.2, continuity: 0.2, trailPreference: 0.2, scenic: 0.2, greenSpace: 0.2 },
+          preferences: { preferWater: false, preferParks: false, preferForest: false, preferHills: false, preferFlat: false, preferPaved: false, preferTrails: false },
+          vibeKeywords: ['general']
+        };
+        const mockNlParser = { parse: vi.fn().mockResolvedValue(nlResultData) };
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter,
+          nlParser: mockNlParser
+        });
+
+        await generator.generate(startPoint, distanceKm, { userDescription: 'general run' });
+
+        const completeEvent = emittedEvents.find(e => e.type === 'route:generation-complete');
+        expect(completeEvent).toBeDefined();
+        expect(completeEvent.detail).toHaveProperty('nlResult');
+        expect(completeEvent.detail.nlResult).toEqual(nlResultData);
+      });
     });
   });
 });

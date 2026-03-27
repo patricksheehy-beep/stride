@@ -19,7 +19,7 @@ import { eventBus } from '../core/event-bus.js';
 import { store } from '../core/state.js';
 import { getCached, setCache, ROUTE_STORE } from '../core/cache.js';
 import { detectRegion } from '../data/region-profiles.js';
-import { getWeightsForRegion } from '../scoring/weights.js';
+import { getWeightsForRegion, mergeWeights } from '../scoring/weights.js';
 import { RouteScorer } from '../scoring/scorer.js';
 
 export class RouteGenerator {
@@ -28,11 +28,15 @@ export class RouteGenerator {
    * @param {object} deps.routeBuilder - RouteBuilder instance for candidate generation
    * @param {object} deps.scorer - RouteScorer instance for scoring and ranking
    * @param {object} deps.overpassAdapter - OverpassAdapter for fetching trail data
+   * @param {object|null} [deps.nlParser=null] - NLParser instance for user description parsing
+   * @param {object|null} [deps.routeExplainer=null] - RouteExplainer instance for explanation generation
    */
-  constructor({ routeBuilder, scorer, overpassAdapter }) {
+  constructor({ routeBuilder, scorer, overpassAdapter, nlParser = null, routeExplainer = null }) {
     this.routeBuilder = routeBuilder;
     this.scorer = scorer;
     this.overpassAdapter = overpassAdapter;
+    this.nlParser = nlParser;
+    this.routeExplainer = routeExplainer;
   }
 
   /**
@@ -86,12 +90,34 @@ export class RouteGenerator {
       // 3. Detect region and get appropriate scoring weights
       const region = detectRegion(startPoint.lat, startPoint.lng);
       const weights = getWeightsForRegion(region);
-      const scorer = new RouteScorer(weights);
+
+      // 3b. Parse NL description if provided
+      let nlResult = null;
+      let finalWeights = weights;
+      if (options.userDescription && this.nlParser) {
+        try {
+          nlResult = await this.nlParser.parse(options.userDescription);
+          if (nlResult?.weights) {
+            finalWeights = mergeWeights(weights, nlResult.weights);
+          }
+        } catch {
+          // NL parsing failed; continue with region defaults
+        }
+      }
+      const scorer = new RouteScorer(finalWeights);
 
       // 4. Calculate bbox and fetch trail data
       const bbox = this._calculateBbox(startPoint, distanceKm);
       const trailData = await this.overpassAdapter.fetchTrails(bbox);
       store.trails = trailData;
+
+      // 4b. Fetch land-use data for green space scoring
+      let landUseData = null;
+      try {
+        landUseData = await this.overpassAdapter.fetchLandUse(bbox);
+      } catch {
+        // Land-use fetch failed; green space scoring will use neutral base
+      }
 
       // 5. Generate candidates via both strategies
       const candidates = [];
@@ -102,7 +128,7 @@ export class RouteGenerator {
           startPoint, distanceKm, 3
         );
         for (const candidate of roundTripCandidates) {
-          candidates.push({ route: candidate, trailData });
+          candidates.push({ route: candidate, trailData, landUseData });
         }
       } catch {
         // Round trip generation failed; continue with waypoint strategy
@@ -115,7 +141,7 @@ export class RouteGenerator {
         );
         // waypointResult is { route, engine } from EngineManager
         const waypointRoute = waypointResult.route || waypointResult;
-        candidates.push({ route: waypointRoute, trailData });
+        candidates.push({ route: waypointRoute, trailData, landUseData });
       } catch {
         // Waypoint generation failed; continue with what we have
       }
@@ -142,10 +168,29 @@ export class RouteGenerator {
         }
       }
 
+      // 8b. Generate explanations for top routes
+      if (this.routeExplainer) {
+        try {
+          const routeDataForExplanation = rankedResults.slice(0, 3).map(result => ({
+            distanceKm: result.distanceKm,
+            score: result.score,
+            ...this.routeExplainer._extractTrailMetadata(result.route, trailData, landUseData),
+            vibeKeywords: nlResult?.vibeKeywords || []
+          }));
+          const explanations = await this.routeExplainer.explainBatch(routeDataForExplanation);
+          for (let i = 0; i < explanations.length && i < rankedResults.length; i++) {
+            rankedResults[i].explanation = explanations[i];
+          }
+        } catch {
+          // Explanation generation failed; routes still usable without explanations
+        }
+      }
+
       // 9. Build result
       const generateResult = {
         routes: rankedResults,
-        bestRoute: rankedResults[0]
+        bestRoute: rankedResults[0],
+        nlResult
       };
 
       // 10. Cache result

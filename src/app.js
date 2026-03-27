@@ -17,6 +17,11 @@ import { OSRMAdapter } from './routing/adapters/osrm.js';
 import { EngineManager } from './routing/engine-manager.js';
 import { OverpassAdapter } from './data/adapters/overpass.js';
 
+// NL processing pipeline (Phase 3)
+import { ClaudeClient } from './nl/claude-client.js';
+import { NLParser } from './nl/nl-parser.js';
+import { RouteExplainer } from './nl/route-explainer.js';
+
 function init() {
   console.log('Stride initializing...');
   const map = initMap('map');
@@ -28,12 +33,25 @@ function init() {
   const scorer = new RouteScorer();
   const routeBuilder = new RouteBuilder({ orsAdapter, engineManager, scorer });
   const overpassAdapter = new OverpassAdapter();
-  const routeGenerator = new RouteGenerator({ routeBuilder, scorer, overpassAdapter });
+
+  // Wire up NL processing (Phase 3)
+  const claudeApiKey = getApiKey('key');
+  let nlParser = null;
+  let routeExplainer = null;
+  if (claudeApiKey) {
+    const claudeClient = new ClaudeClient(claudeApiKey);
+    nlParser = new NLParser(claudeClient);
+    routeExplainer = new RouteExplainer(claudeClient);
+  }
+
+  const routeGenerator = new RouteGenerator({
+    routeBuilder, scorer, overpassAdapter, nlParser, routeExplainer
+  });
 
   // Listen for route generation requests from UI components
-  eventBus.on('route:generate-requested', async ({ startPoint, distanceKm }) => {
+  eventBus.on('route:generate-requested', async ({ startPoint, distanceKm, userDescription }) => {
     try {
-      await routeGenerator.generate(startPoint, distanceKm);
+      await routeGenerator.generate(startPoint, distanceKm, { userDescription });
     } catch (err) {
       console.error('Route generation failed:', err);
     }
