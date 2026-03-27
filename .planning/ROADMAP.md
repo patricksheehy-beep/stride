@@ -84,8 +84,8 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01-PLAN.md -- ORS elevation/instructions enrichment, GPX export builder, and Chart.js elevation profile
-- [ ] 04-02-PLAN.md -- Scoring Web Worker and PWA manifest/icons/offline/caching completion
+- [x] 04-01-PLAN.md -- ORS elevation/instructions enrichment, GPX export builder, and Chart.js elevation profile
+- [x] 04-02-PLAN.md -- Scoring Web Worker and PWA manifest/icons/offline/caching completion
 - [ ] 04-03-PLAN.md -- Route renderer (waypoints, distance markers), route info panel, mobile-responsive layout
 
 ### Phase 5: Global Validation

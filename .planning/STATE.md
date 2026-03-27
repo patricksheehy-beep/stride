@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-03-27T18:51:58.468Z"
+status: Ready to execute
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-27T20:22:42.300Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 12
+  completed_plans: 10
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Every generated route should feel like a local runner recommended it -- hitting the best trails, paths, and scenic spots in any location worldwide.
-**Current focus:** Phase 03 — natural-language-route-intelligence-and-data-enrichment
+**Current focus:** Phase 04 — export-map-experience-and-pwa
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
+Phase: 04 (export-map-experience-and-pwa) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: Not started
 | Phase 03 P01 | 7min | 2 tasks | 13 files |
 | Phase 03 P02 | 3min | 1 tasks | 7 files |
 | Phase 03 P03 | 5min | 2 tasks | 6 files |
+| Phase 04 P02 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,9 @@ Recent decisions affecting current work:
 - [Phase 03]: RouteExplainer uses free-text Claude output (no structured schema) for explanation generation -- prose output is more natural
 - [Phase 03]: Batch explanation parsing splits on Route N: labels for single-API-call efficiency
 - [Phase 03]: NL modules injected as optional deps (default null) for full backward compatibility with Phase 2
+- [Phase 04]: ESM module worker (type: module) for Vite-compatible scoring offload with 30s timeout and auto-fallback
+- [Phase 04]: NetworkFirst API caching (was StaleWhileRevalidate) with 10s timeout for fresher route data
+- [Phase 04]: Programmatic PNG icon generation via raw encoding to avoid sharp/canvas dependency
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T18:51:22.704Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-03-27T20:22:42.296Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
