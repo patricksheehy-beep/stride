@@ -53,10 +53,62 @@ describe('ORSAdapter', () => {
       expect(body.geometry).toBe(true);
     });
 
-    it('sets instructions to false', () => {
+    it('sets instructions to true', () => {
       const adapter = new ORSAdapter('test-api-key');
       const body = adapter.buildRequestBody([{ lat: 37.7, lng: -122.4 }]);
-      expect(body.instructions).toBe(false);
+      expect(body.instructions).toBe(true);
+    });
+
+    it('includes elevation: true in the request body', () => {
+      const adapter = new ORSAdapter('test-api-key');
+      const body = adapter.buildRequestBody([{ lat: 37.7, lng: -122.4 }]);
+      expect(body.elevation).toBe(true);
+    });
+
+    it('includes instructions_format as text', () => {
+      const adapter = new ORSAdapter('test-api-key');
+      const body = adapter.buildRequestBody([{ lat: 37.7, lng: -122.4 }]);
+      expect(body.instructions_format).toBe('text');
+    });
+  });
+
+  describe('roundTrip', () => {
+    it('includes elevation: true in round trip request body', async () => {
+      const adapter = new ORSAdapter('test-api-key');
+      let capturedBody = null;
+
+      // Mock fetch to capture the request body
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async (url, opts) => {
+        capturedBody = JSON.parse(opts.body);
+        return { ok: true, status: 200, json: async () => ({ type: 'FeatureCollection', features: [] }) };
+      };
+
+      try {
+        await adapter.roundTrip({ lat: 37.7, lng: -122.4 }, { length: 5000 });
+        expect(capturedBody.elevation).toBe(true);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('includes instructions: true in round trip request body', async () => {
+      const adapter = new ORSAdapter('test-api-key');
+      let capturedBody = null;
+
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async (url, opts) => {
+        capturedBody = JSON.parse(opts.body);
+        return { ok: true, status: 200, json: async () => ({ type: 'FeatureCollection', features: [] }) };
+      };
+
+      try {
+        await adapter.roundTrip({ lat: 37.7, lng: -122.4 });
+        expect(capturedBody.instructions).toBe(true);
+        expect(capturedBody.instructions_format).toBe('text');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
     });
   });
 });
