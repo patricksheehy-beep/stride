@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { eventBus } from './core/event-bus.js';
 import { store } from './core/state.js';
 import { config, getApiKey } from './core/config.js';
-import { initMap } from './map/map-manager.js';
+import { initMap, getMap } from './map/map-manager.js';
 
 // Route generation pipeline (Phase 2)
 import { RouteGenerator } from './routing/route-generator.js';
@@ -22,9 +22,16 @@ import { ClaudeClient } from './nl/claude-client.js';
 import { NLParser } from './nl/nl-parser.js';
 import { RouteExplainer } from './nl/route-explainer.js';
 
+// Route display pipeline (Phase 4)
+import { RoutePanel } from './ui/route-panel.js';
+import { renderRoute, clearRoute, addDistanceMarkers, addTurnMarkers, extractTurnPoints } from './map/route-renderer.js';
+
 function init() {
   console.log('Stride initializing...');
   const map = initMap('map');
+
+  // Initialize route info panel
+  const routePanel = new RoutePanel('route-panel-container');
 
   // Wire up route generation pipeline
   const orsAdapter = new ORSAdapter(getApiKey('ors'));
@@ -54,6 +61,36 @@ function init() {
       await routeGenerator.generate(startPoint, distanceKm, { userDescription });
     } catch (err) {
       console.error('Route generation failed:', err);
+    }
+  });
+
+  // Render route on map when generation completes
+  eventBus.on('route:generation-complete', ({ bestRoute }) => {
+    const mapInstance = getMap();
+    if (!mapInstance || !bestRoute?.route) return;
+
+    // Clear previous route and render new one
+    clearRoute(mapInstance);
+    renderRoute(mapInstance, bestRoute.route);
+
+    // Add turn-by-turn markers from ORS instructions
+    const turnPoints = extractTurnPoints(bestRoute.route);
+    if (turnPoints.length > 0) {
+      addTurnMarkers(mapInstance, turnPoints);
+    }
+
+    // Add distance markers at 1km intervals
+    const routeFeature = bestRoute.route.features?.[0];
+    if (routeFeature) {
+      addDistanceMarkers(mapInstance, routeFeature, 1);
+    }
+  });
+
+  // Clear route from map when new generation starts
+  eventBus.on('route:generation-started', () => {
+    const mapInstance = getMap();
+    if (mapInstance) {
+      clearRoute(mapInstance);
     }
   });
 

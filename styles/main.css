@@ -1,3 +1,15 @@
+/* ==========================================
+   Stride - AI Running Route Generator
+   Design System:
+     Background: #0A0A0A
+     Text primary: #F5F5F5
+     Text secondary: #888
+     Accent: #E8C547
+     Font display: 'Instrument Serif', serif
+     Font body: 'DM Sans', system-ui, sans-serif
+     Border radius: 12px (panels), 8px (buttons)
+   ========================================== */
+
 * {
   margin: 0;
   padding: 0;
@@ -6,15 +18,230 @@
 
 html, body {
   height: 100%;
-  font-family: system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #0A0A0A;
+  color: #F5F5F5;
 }
+
+/* ---- App Layout (mobile-first) ---- */
 
 #app {
   height: 100%;
   display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 #map {
   flex: 1;
-  min-height: 400px;
+  min-height: 60vh;
+}
+
+/* ---- Route Panel ---- */
+
+#route-panel-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.route-panel {
+  background: #111;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 0.75rem 1rem 1rem;
+  max-height: 40vh;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  pointer-events: auto;
+}
+
+.route-panel--hidden {
+  transform: translateY(100%);
+}
+
+.route-panel-handle {
+  width: 40px;
+  height: 4px;
+  background: #333;
+  margin: 0 auto 1rem;
+  border-radius: 2px;
+}
+
+.route-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---- Route Stats ---- */
+
+.route-stats {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  color: #E8C547;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Elevation Chart ---- */
+
+.elevation-chart-container {
+  height: 150px;
+  position: relative;
+}
+
+.elevation-chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ---- Route Explanation ---- */
+
+.route-explanation {
+  color: #ccc;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* ---- Export Button ---- */
+
+.export-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #E8C547;
+  color: #0A0A0A;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.export-btn:hover {
+  background: #d4b340;
+}
+
+.export-btn:active {
+  transform: scale(0.98);
+}
+
+/* ---- Distance Markers ---- */
+
+.distance-marker {
+  background: #E8C547;
+  color: #0A0A0A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 2px solid #0A0A0A;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.distance-marker span {
+  line-height: 1;
+}
+
+/* ---- Loading/Generating State ---- */
+
+.route-panel--loading .stat-value {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---- Leaflet Overrides ---- */
+
+.leaflet-control-layers {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  border-radius: 8px !important;
+  color: #F5F5F5 !important;
+}
+
+.leaflet-control-layers label {
+  color: #F5F5F5 !important;
+}
+
+.leaflet-control-zoom a {
+  background: #1a1a1a !important;
+  color: #F5F5F5 !important;
+  border-color: #333 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #333 !important;
+}
+
+/* ---- Desktop Layout ---- */
+
+@media (min-width: 768px) {
+  #app {
+    flex-direction: row;
+  }
+
+  #map {
+    min-height: 100vh;
+  }
+
+  #route-panel-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: auto;
+    width: 380px;
+  }
+
+  .route-panel {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-radius: 0;
+    max-height: 100vh;
+    height: 100%;
+  }
+
+  .route-panel--hidden {
+    transform: translateX(100%);
+  }
+
+  .route-panel-handle {
+    display: none;
+  }
+}
+
+/* ---- Safe area insets for notched phones ---- */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .route-panel {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
 }
