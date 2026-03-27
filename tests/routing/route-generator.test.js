@@ -476,6 +476,76 @@ describe('RouteGenerator', () => {
       expect(store.trails.type).toBe('FeatureCollection');
     });
 
+    // Phase 5 data quality integration tests
+    describe('data quality integration', () => {
+      it('result includes dataQuality with density, message, and totalFeatures', async () => {
+        // Default mock returns 3 trail features (sparse)
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter
+        });
+
+        const result = await generator.generate(startPoint, distanceKm);
+
+        expect(result).toHaveProperty('dataQuality');
+        expect(result.dataQuality).toHaveProperty('density');
+        expect(result.dataQuality).toHaveProperty('message');
+        expect(result.dataQuality).toHaveProperty('totalFeatures');
+        // Mock trail data has 3 features => sparse
+        expect(result.dataQuality.density).toBe('sparse');
+        expect(result.dataQuality.totalFeatures).toBe(3);
+      });
+
+      it('emits route:data-quality event with region and dataQuality', async () => {
+        const dataQualityEvents = [];
+        const unsub = eventBus.on('route:data-quality', (detail) => {
+          dataQualityEvents.push(detail);
+        });
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter
+        });
+
+        await generator.generate(startPoint, distanceKm);
+        unsub();
+
+        expect(dataQualityEvents.length).toBe(1);
+        expect(dataQualityEvents[0]).toHaveProperty('region');
+        expect(dataQualityEvents[0]).toHaveProperty('dataQuality');
+        expect(dataQualityEvents[0].dataQuality).toHaveProperty('density');
+      });
+
+      it('enhanced error message includes sparse info when no candidates and data is sparse', async () => {
+        // Mock empty trail data (0 features = sparse)
+        mockOverpassAdapter.fetchTrails = vi.fn().mockResolvedValue({
+          type: 'FeatureCollection',
+          features: []
+        });
+
+        // Both generation strategies fail
+        mockRouteBuilder.generateCandidatesViaRoundTrip = vi.fn().mockRejectedValue(
+          new Error('No routes')
+        );
+        mockRouteBuilder.generateCandidateViaWaypoints = vi.fn().mockRejectedValue(
+          new Error('No routes')
+        );
+
+        const generator = new RouteGenerator({
+          routeBuilder: mockRouteBuilder,
+          scorer: mockScorer,
+          overpassAdapter: mockOverpassAdapter
+        });
+
+        await expect(generator.generate(startPoint, distanceKm))
+          .rejects.toThrow(/sparse/i);
+        await expect(generator.generate(startPoint, distanceKm))
+          .rejects.toThrow(/limited/i);
+      });
+    });
+
     // Phase 3 integration tests
     describe('NL and explanation integration', () => {
       it('with userDescription calls nlParser.parse and merges weights', async () => {

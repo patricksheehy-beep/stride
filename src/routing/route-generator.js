@@ -21,6 +21,7 @@ import { getCached, setCache, ROUTE_STORE } from '../core/cache.js';
 import { detectRegion } from '../data/region-profiles.js';
 import { getWeightsForRegion, mergeWeights } from '../scoring/weights.js';
 import { RouteScorer } from '../scoring/scorer.js';
+import { analyzeDataQuality } from '../data/data-quality.js';
 
 export class RouteGenerator {
   /**
@@ -163,6 +164,10 @@ export class RouteGenerator {
       const trailData = await this.overpassAdapter.fetchTrails(bbox);
       store.trails = trailData;
 
+      // 4a. Analyze trail data quality for this region
+      const dataQuality = analyzeDataQuality(trailData);
+      eventBus.emit('route:data-quality', { region, dataQuality });
+
       // 4b. Fetch land-use data for green space scoring
       let landUseData = null;
       try {
@@ -200,7 +205,10 @@ export class RouteGenerator {
 
       // 6. If no candidates at all, throw
       if (candidates.length === 0) {
-        throw new Error('No route candidates could be generated');
+        const qualityInfo = dataQuality.density === 'sparse'
+          ? ` Trail data is sparse in this area (${dataQuality.totalFeatures} features found). ${dataQuality.message}`
+          : '';
+        throw new Error(`No route candidates could be generated.${qualityInfo}`);
       }
 
       // 7. Score and rank all candidates (prefer Web Worker, fallback to main thread)
@@ -252,7 +260,8 @@ export class RouteGenerator {
       const generateResult = {
         routes: rankedResults,
         bestRoute: rankedResults[0],
-        nlResult
+        nlResult,
+        dataQuality
       };
 
       // 10. Cache result
