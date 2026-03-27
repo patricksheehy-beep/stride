@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-03-27T14:19:03.175Z"
+status: Ready to execute
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-27T18:38:22.280Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 9
+  completed_plans: 7
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Every generated route should feel like a local runner recommended it -- hitting the best trails, paths, and scenic spots in any location worldwide.
-**Current focus:** Phase 02 — route-building-and-scoring-engine
+**Current focus:** Phase 03 — natural-language-route-intelligence-and-data-enrichment
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
+Phase: 03 (natural-language-route-intelligence-and-data-enrichment) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: Not started
 | Phase 02 P01 | 35min | 2 tasks | 14 files |
 | Phase 02 P02 | 13min | 1 tasks | 4 files |
 | Phase 02 P03 | 16min | 2 tasks | 3 files |
+| Phase 03 P01 | 7min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,10 @@ Recent decisions affecting current work:
 - [Phase 02]: Waypoint snapping falls back to raw geometric position when no trail features available (handles data-sparse regions)
 - [Phase 02]: RouteGenerator creates region-detected scorer internally rather than reusing injected scorer -- ensures scoring matches geographic location
 - [Phase 02]: Independent try/catch per generation strategy (round_trip, waypoints) for graceful degradation when ORS is unavailable
+- [Phase 03]: Neutral base 0.4 for green space when no land-use data (avoids penalizing data-sparse regions)
+- [Phase 03]: 100m sampling interval for point-in-polygon testing (balance accuracy vs performance)
+- [Phase 03]: greenSpace weight 0.20 across all regions; scenic reduced 0.20->0.15 (greenSpace handles geometric measurement)
+- [Phase 03]: Land-use cache TTL 7 days (polygons change rarely vs 24h for trail data)
 
 ### Pending Todos
 
@@ -88,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T14:10:26.763Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-03-27T18:38:22.276Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

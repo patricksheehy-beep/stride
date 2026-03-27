@@ -19,8 +19,8 @@
 
 - [x] **DATA-01**: Overpass queries comprehensively fetch all trail types -- paths, footways, tracks, cycleways, and named routes -- using region-adaptive OSM tag sets
 - [x] **DATA-02**: Routing engine prefers trails over roads -- uses ORS foot-hiking profile with waypoint-based trail forcing, OSRM as fallback only
-- [ ] **DATA-03**: Multi-source data fusion combines OSM trail geometry, route relations, land-use polygons, surface tags, and trail naming to approximate "where locals run"
-- [ ] **DATA-04**: Green space scoring calculates proximity to parks, nature reserves, water bodies, and tree cover for each route segment
+- [x] **DATA-03**: Multi-source data fusion combines OSM trail geometry, route relations, land-use polygons, surface tags, and trail naming to approximate "where locals run"
+- [x] **DATA-04**: Green space scoring calculates proximity to parks, nature reserves, water bodies, and tree cover for each route segment
 - [x] **DATA-05**: Route generation adapts to global OSM tagging conventions -- works correctly in US, Europe, Japan, and regions with different tagging norms
 
 ### Export & Usability
@@ -93,8 +93,8 @@
 | ROUTE-07 | Phase 2 | Complete |
 | ROUTE-05 | Phase 3 | Pending |
 | ROUTE-06 | Phase 3 | Pending |
-| DATA-03 | Phase 3 | Pending |
-| DATA-04 | Phase 3 | Pending |
+| DATA-03 | Phase 3 | Complete |
+| DATA-04 | Phase 3 | Complete |
 | EXPORT-01 | Phase 4 | Pending |
 | EXPORT-02 | Phase 4 | Pending |
 | EXPORT-03 | Phase 4 | Pending |
