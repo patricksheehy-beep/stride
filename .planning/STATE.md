@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-27T18:38:22.280Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-03-27T18:43:54.923Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 03 (natural-language-route-intelligence-and-data-enrichment) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Plan: 2 of 3
 | Phase 02 P02 | 13min | 1 tasks | 4 files |
 | Phase 02 P03 | 16min | 2 tasks | 3 files |
 | Phase 03 P01 | 7min | 2 tasks | 13 files |
+| Phase 03 P02 | 3min | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 100m sampling interval for point-in-polygon testing (balance accuracy vs performance)
 - [Phase 03]: greenSpace weight 0.20 across all regions; scenic reduced 0.20->0.15 (greenSpace handles geometric measurement)
 - [Phase 03]: Land-use cache TTL 7 days (polygons change rarely vs 24h for trail data)
+- [Phase 03]: Claude Haiku 4.5 (claude-haiku-4-5-20250514) as default NL parsing model -- cheapest structured output model, sufficient for route vibe parsing
+- [Phase 03]: Direct fetch() to Claude API with anthropic-dangerous-direct-browser-access header instead of SDK -- smaller bundle for single endpoint
+- [Phase 03]: NLParser returns null on any API failure (graceful degradation) -- scoring pipeline continues with default weights
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T18:38:22.276Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-03-27T18:43:54.917Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None

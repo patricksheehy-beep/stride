@@ -67,7 +67,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md -- Land-use data pipeline (Overpass polygon query + normalization) and green space scoring factor with 5-factor weight expansion
-- [ ] 03-02-PLAN.md -- Claude API client, NL parser (vibes to weight adjustments), and weight merging
+- [x] 03-02-PLAN.md -- Claude API client, NL parser (vibes to weight adjustments), and weight merging
 - [ ] 03-03-PLAN.md -- Route explanation generation and full pipeline integration (NL + green space + explanations wired into RouteGenerator)
 
 ### Phase 4: Export, Map Experience, and PWA
