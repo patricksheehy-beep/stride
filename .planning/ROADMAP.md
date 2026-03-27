@@ -52,7 +52,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md -- Multi-factor scoring engine (surface, trail preference, continuity, scenic) with configurable region weights
 - [x] 02-02-PLAN.md -- ORS round_trip support, RouteBuilder with loop generation, waypoint trail forcing, and distance refinement
-- [ ] 02-03-PLAN.md -- RouteGenerator pipeline integrating generation + scoring + ranking, wired to app state and EventBus
+- [x] 02-03-PLAN.md -- RouteGenerator pipeline integrating generation + scoring + ranking, wired to app state and EventBus
 
 ### Phase 3: Natural Language, Route Intelligence, and Data Enrichment
 **Goal**: Users can describe the run they want in plain English and receive routes that match, with explanations of why each route was chosen, powered by enriched data from multiple OSM signal types
