@@ -23,6 +23,7 @@
     "@turf/helpers": "^7.3.4",
     "@turf/length": "^7.3.4",
     "@turf/nearest-point-on-line": "^7.3.4",
+    "chart.js": "^4.5.1",
     "idb": "^8.0.3",
     "leaflet": "1.9.4",
     "openrouteservice-js": "^0.4.1"
