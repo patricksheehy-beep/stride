@@ -15,15 +15,15 @@ Every generated route should feel like a local runner recommended it — hitting
 - Codebase restructured from single index.html into modular ES Module architecture — Validated in Phase 1
 - Overpass queries find all relevant trails, paths, and runnable routes near the user — Validated in Phase 1
 - ORS foot-hiking routing with OSRM fallback — Validated in Phase 1
+- Multi-factor scoring engine (surface, trail preference, continuity, scenic) with region-adaptive weights — Validated in Phase 2
+- Loop route generation with iterative distance refinement (within 10% accuracy) — Validated in Phase 2
+- 3+ ranked route candidates per request — Validated in Phase 2
 
 ### Active
-
-- [ ] Scoring formula surfaces the best routes, not just the closest or longest (pending Phase 2)
 - [ ] All three routing modes (Trail, Sightseeing, Streets-OK) produce high-quality results globally
 - [ ] Route generation works across any terrain type — urban, suburban, rural, mountain
 - [ ] Multiple data sources layered (OSM + Strava heatmaps + Google/Apple Maps) to fill gaps where any single source has sparse data
 - [ ] No unrunnable routes — no dead ends, zig-zags, or road-heavy paths when trails exist
-- [ ] Distance accuracy — requested distance matches actual route distance
 
 ### Out of Scope
 
@@ -74,4 +74,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after Phase 1 completion*
+*Last updated: 2026-03-27 after Phase 2 completion*
