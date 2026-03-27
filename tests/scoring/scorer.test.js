@@ -51,7 +51,7 @@ describe('RouteScorer', () => {
   });
 
   it('new RouteScorer(customWeights) uses provided weights', () => {
-    const custom = { surface: 0.5, continuity: 0.2, trailPreference: 0.2, scenic: 0.1 };
+    const custom = { surface: 0.4, continuity: 0.15, trailPreference: 0.2, scenic: 0.1, greenSpace: 0.15 };
     const scorer = new RouteScorer(custom);
     expect(scorer.weights).toEqual(custom);
   });
@@ -71,13 +71,14 @@ describe('RouteScorer', () => {
     expect(result.total).toBeLessThanOrEqual(1);
   });
 
-  it('breakdown has keys: surfaceScore, continuityScore, trailPrefScore, scenicScore', () => {
+  it('breakdown has keys: surfaceScore, continuityScore, trailPrefScore, scenicScore, greenSpaceScore', () => {
     const scorer = new RouteScorer();
     const result = scorer.scoreRoute(trailHeavyRoute, trailHeavyData, startPoint);
     expect(result.breakdown).toHaveProperty('surfaceScore');
     expect(result.breakdown).toHaveProperty('continuityScore');
     expect(result.breakdown).toHaveProperty('trailPrefScore');
     expect(result.breakdown).toHaveProperty('scenicScore');
+    expect(result.breakdown).toHaveProperty('greenSpaceScore');
   });
 
   it('each breakdown value is between 0 and 1', () => {
@@ -89,15 +90,41 @@ describe('RouteScorer', () => {
     }
   });
 
-  it('total equals weighted sum of breakdown values', () => {
+  it('total equals weighted sum of all 5 breakdown values', () => {
     const scorer = new RouteScorer();
     const result = scorer.scoreRoute(trailHeavyRoute, trailHeavyData, startPoint);
     const expectedTotal =
       scorer.weights.surface * result.breakdown.surfaceScore +
       scorer.weights.continuity * result.breakdown.continuityScore +
       scorer.weights.trailPreference * result.breakdown.trailPrefScore +
-      scorer.weights.scenic * result.breakdown.scenicScore;
+      scorer.weights.scenic * result.breakdown.scenicScore +
+      scorer.weights.greenSpace * result.breakdown.greenSpaceScore;
     expect(result.total).toBeCloseTo(expectedTotal, 10);
+  });
+
+  it('scoreRoute accepts optional landUseData parameter', () => {
+    const scorer = new RouteScorer();
+    // Should not throw when called with 4 args
+    const result = scorer.scoreRoute(trailHeavyRoute, trailHeavyData, startPoint, null);
+    expect(result).toHaveProperty('total');
+    expect(result).toHaveProperty('breakdown');
+  });
+
+  it('when landUseData is not provided, greenSpace uses neutral base score', () => {
+    const scorer = new RouteScorer();
+    const result = scorer.scoreRoute(trailHeavyRoute, trailHeavyData, startPoint);
+    // Neutral base is 0.4 when no land-use data
+    expect(result.breakdown.greenSpaceScore).toBe(0.4);
+  });
+
+  it('scoreRoute total includes greenSpace weighted contribution', () => {
+    const scorer = new RouteScorer();
+    const result = scorer.scoreRoute(trailHeavyRoute, trailHeavyData, startPoint);
+    // greenSpaceScore is 0.4 (neutral) * greenSpace weight should be part of total
+    const greenContribution = scorer.weights.greenSpace * result.breakdown.greenSpaceScore;
+    expect(greenContribution).toBeGreaterThan(0);
+    // Total must be positive (all factor contributions)
+    expect(result.total).toBeGreaterThan(0);
   });
 
   it('trail-heavy route scores higher than road-heavy route (ROUTE-04 validation)', () => {

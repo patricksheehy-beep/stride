@@ -2,12 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { DEFAULT_WEIGHTS, REGION_WEIGHTS, getWeightsForRegion } from '../../src/scoring/weights.js';
 
 describe('DEFAULT_WEIGHTS', () => {
-  it('has 4 keys: surface, continuity, trailPreference, scenic', () => {
+  it('has 5 keys: surface, continuity, trailPreference, scenic, greenSpace', () => {
     expect(DEFAULT_WEIGHTS).toHaveProperty('surface');
     expect(DEFAULT_WEIGHTS).toHaveProperty('continuity');
     expect(DEFAULT_WEIGHTS).toHaveProperty('trailPreference');
     expect(DEFAULT_WEIGHTS).toHaveProperty('scenic');
-    expect(Object.keys(DEFAULT_WEIGHTS)).toHaveLength(4);
+    expect(DEFAULT_WEIGHTS).toHaveProperty('greenSpace');
+    expect(Object.keys(DEFAULT_WEIGHTS)).toHaveLength(5);
   });
 
   it('values sum to 1.0', () => {
@@ -15,11 +16,11 @@ describe('DEFAULT_WEIGHTS', () => {
     expect(sum).toBeCloseTo(1.0, 5);
   });
 
-  it('trailPreference has the highest weight (0.30)', () => {
-    expect(DEFAULT_WEIGHTS.trailPreference).toBe(0.30);
+  it('trailPreference has the highest weight', () => {
     expect(DEFAULT_WEIGHTS.trailPreference).toBeGreaterThanOrEqual(DEFAULT_WEIGHTS.surface);
     expect(DEFAULT_WEIGHTS.trailPreference).toBeGreaterThanOrEqual(DEFAULT_WEIGHTS.continuity);
     expect(DEFAULT_WEIGHTS.trailPreference).toBeGreaterThanOrEqual(DEFAULT_WEIGHTS.scenic);
+    expect(DEFAULT_WEIGHTS.trailPreference).toBeGreaterThanOrEqual(DEFAULT_WEIGHTS.greenSpace);
   });
 });
 
@@ -29,9 +30,19 @@ describe('getWeightsForRegion', () => {
     expect(weights).toEqual(DEFAULT_WEIGHTS);
   });
 
-  it('returns weights for "japan" where surface is higher than default', () => {
+  it('returns weights for "japan" where surface is boosted', () => {
     const weights = getWeightsForRegion('japan');
-    expect(weights.surface).toBeGreaterThan(DEFAULT_WEIGHTS.surface);
+    expect(weights.surface).toBeGreaterThanOrEqual(0.25);
+  });
+
+  it('returns weights for all regions with greenSpace property', () => {
+    const regions = ['default', 'japan', 'europe', 'us'];
+    for (const region of regions) {
+      const weights = getWeightsForRegion(region);
+      expect(weights).toHaveProperty('greenSpace');
+      expect(typeof weights.greenSpace).toBe('number');
+      expect(weights.greenSpace).toBeGreaterThan(0);
+    }
   });
 
   it('returns weights for "europe" where trailPreference is boosted', () => {
@@ -67,9 +78,15 @@ describe('REGION_WEIGHTS', () => {
     expect(REGION_WEIGHTS).toHaveProperty('us');
   });
 
-  it('each profile has the same 4 keys as DEFAULT_WEIGHTS', () => {
+  it('each profile has the same 5 keys as DEFAULT_WEIGHTS', () => {
     for (const profile of Object.values(REGION_WEIGHTS)) {
       expect(Object.keys(profile).sort()).toEqual(Object.keys(DEFAULT_WEIGHTS).sort());
+    }
+  });
+
+  it('all REGION_WEIGHTS profiles have greenSpace key', () => {
+    for (const [name, profile] of Object.entries(REGION_WEIGHTS)) {
+      expect(profile).toHaveProperty('greenSpace');
     }
   });
 });
