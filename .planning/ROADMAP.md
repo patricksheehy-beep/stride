@@ -99,7 +99,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md -- Golden test fixtures, expanded region detection (South America, Africa, Oceania, Southeast Asia), and data quality analysis utility
+- [x] 05-01-PLAN.md -- Golden test fixtures, expanded region detection (South America, Africa, Oceania, Southeast Asia), and data quality analysis utility
 - [ ] 05-02-PLAN.md -- Golden test suite (region detection, query coverage, scoring validation) and data-sparse degradation in route generator
 
 ## Progress

@@ -40,8 +40,8 @@
 
 ### Global Validation
 
-- [ ] **GLOBAL-01**: Golden test set of 20+ locations across 3+ continents validates route quality after every algorithm change
-- [ ] **GLOBAL-02**: Region-adaptive OSM tag handling detects and adjusts for local tagging conventions automatically
+- [x] **GLOBAL-01**: Golden test set of 20+ locations across 3+ continents validates route quality after every algorithm change
+- [x] **GLOBAL-02**: Region-adaptive OSM tag handling detects and adjusts for local tagging conventions automatically
 
 ## v2 Requirements
 
@@ -102,8 +102,8 @@
 | EXPORT-05 | Phase 4 | Complete |
 | ARCH-02 | Phase 4 | Complete |
 | ARCH-03 | Phase 4 | Complete |
-| GLOBAL-01 | Phase 5 | Pending |
-| GLOBAL-02 | Phase 5 | Pending |
+| GLOBAL-01 | Phase 5 | Complete |
+| GLOBAL-02 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 23 total

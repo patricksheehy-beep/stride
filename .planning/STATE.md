@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-03-27T20:31:17.061Z"
+status: Ready to execute
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-27T20:50:04.819Z"
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 14
+  completed_plans: 13
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Every generated route should feel like a local runner recommended it -- hitting the best trails, paths, and scenic spots in any location worldwide.
-**Current focus:** Phase 04 — export-map-experience-and-pwa
+**Current focus:** Phase 05 — global-validation
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
+Phase: 05 (global-validation) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Plan: Not started
 | Phase 04 P02 | 5min | 2 tasks | 10 files |
 | Phase 04 P01 | 5min | 2 tasks | 8 files |
 | Phase 04 P03 | 4min | 2 tasks | 8 files |
+| Phase 05 P01 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,9 @@ Recent decisions affecting current work:
 - [Phase 04]: Route layer group pattern: map._strideRouteGroup stores all route-related layers for atomic clear/re-render
 - [Phase 04]: Trail name extraction from ORS instruction text via regex for EXPORT-04 local context
 - [Phase 04]: Mobile-first responsive layout: bottom sheet on mobile, 380px side panel on desktop at 768px breakpoint
+- [Phase 05]: Iceland returns europe (falls within existing Europe bounding box lat 35-72, lng -25 to 45) rather than default
+- [Phase 05]: Region detection order: japan, europe, us, southeast_asia, oceania, south_america, africa, default -- prevents Japan/SE-Asia overlap misclassification
+- [Phase 05]: Data quality density thresholds: sparse <=5, moderate 6-25, rich 26+ features -- balances user feedback with OSM variability
 
 ### Pending Todos
 
@@ -114,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-27T20:30:31.058Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-03-27T20:50:04.815Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
