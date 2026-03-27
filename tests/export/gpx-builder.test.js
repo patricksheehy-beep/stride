@@ -65,8 +65,18 @@ describe('buildGPX', () => {
 
     expect(gpx).toContain('Tom &amp; Jerry&apos;s &lt;Route&gt; &quot;Special&quot;');
     expect(gpx).toContain('Point A &amp; B &lt;here&gt;');
-    // Must not contain unescaped ampersands in names
-    expect(gpx).not.toMatch(/<name>[^<]*[&][^a][^<]*<\/name>/);
+    // Must not contain raw unescaped special characters in name elements
+    // All & should be followed by amp; apos; lt; gt; or quot; (valid XML entities)
+    const nameContents = gpx.match(/<name>(.*?)<\/name>/g) || [];
+    for (const nameTag of nameContents) {
+      const content = nameTag.replace(/<\/?name>/g, '');
+      // Every & must be part of a valid XML entity
+      const ampersands = [...content.matchAll(/&/g)];
+      for (const match of ampersands) {
+        const after = content.slice(match.index);
+        expect(after).toMatch(/^&(amp|lt|gt|quot|apos);/);
+      }
+    }
   });
 
   it('omits ele elements gracefully when given 2D coordinates', () => {

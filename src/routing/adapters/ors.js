@@ -27,7 +27,9 @@ export class ORSAdapter {
       preference: 'recommended',
       units: 'km',
       geometry: true,
-      instructions: false,
+      elevation: true,
+      instructions: true,
+      instructions_format: 'text',
       options: {
         profile_params: {
           weightings: {
@@ -94,7 +96,9 @@ export class ORSAdapter {
       preference: 'recommended',
       units: 'km',
       geometry: true,
-      instructions: false,
+      elevation: true,
+      instructions: true,
+      instructions_format: 'text',
       options: {
         round_trip: {
           length: length,
