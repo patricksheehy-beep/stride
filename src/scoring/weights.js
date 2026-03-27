@@ -29,10 +29,14 @@ export const DEFAULT_WEIGHTS = {
  * Each region adjusts weights based on local OSM data quality and
  * trail network characteristics. All profiles sum to 1.0.
  *
- * - japan:  Surface tagging is reliable, so surface weight is boosted.
- * - europe: Excellent trail networks with route relations, so trailPreference is boosted.
- * - us:     Sparse surface tagging, so continuity matters more.
- * - default: Balanced weights for unknown regions.
+ * - japan:          Surface tagging is reliable, so surface weight is boosted.
+ * - europe:         Excellent trail networks with route relations, so trailPreference is boosted.
+ * - us:             Sparse surface tagging, so continuity matters more.
+ * - south_america:  Continuity boosted -- sparse tagging similar to US.
+ * - africa:         Surface lowest (sparse tags); continuity highest (avoiding dead ends critical).
+ * - oceania:        Balanced like default -- good urban OSM coverage.
+ * - southeast_asia: Continuity boosted -- variable tagging quality.
+ * - default:        Balanced weights for unknown regions.
  */
 export const REGION_WEIGHTS = {
   default: { ...DEFAULT_WEIGHTS },
@@ -59,6 +63,38 @@ export const REGION_WEIGHTS = {
     trailPreference: 0.25,
     scenic: 0.15,
     greenSpace: 0.20
+  },
+
+  south_america: {
+    surface: 0.15,
+    continuity: 0.25,
+    trailPreference: 0.25,
+    scenic: 0.15,
+    greenSpace: 0.20
+  },
+
+  africa: {
+    surface: 0.10,
+    continuity: 0.30,
+    trailPreference: 0.25,
+    scenic: 0.15,
+    greenSpace: 0.20
+  },
+
+  oceania: {
+    surface: 0.20,
+    continuity: 0.20,
+    trailPreference: 0.25,
+    scenic: 0.15,
+    greenSpace: 0.20
+  },
+
+  southeast_asia: {
+    surface: 0.15,
+    continuity: 0.25,
+    trailPreference: 0.25,
+    scenic: 0.15,
+    greenSpace: 0.20
   }
 };
 
@@ -66,7 +102,7 @@ export const REGION_WEIGHTS = {
  * Look up the weight profile for a given region key.
  * Falls back to DEFAULT_WEIGHTS for unknown regions.
  *
- * @param {string} regionKey - Region identifier ('japan', 'europe', 'us', 'default')
+ * @param {string} regionKey - Region identifier ('japan', 'europe', 'us', 'south_america', 'africa', 'oceania', 'southeast_asia', 'default')
  * @returns {Object} Weight profile with keys: surface, continuity, trailPreference, scenic, greenSpace
  */
 export function getWeightsForRegion(regionKey) {

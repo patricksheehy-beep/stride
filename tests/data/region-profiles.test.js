@@ -196,8 +196,9 @@ describe('detectRegion', () => {
     expect(detectRegion(13.7, 100.5)).toBe('southeast_asia');
   });
 
-  it('returns default for Iceland coordinates (64.1, -21.9)', () => {
-    expect(detectRegion(64.1, -21.9)).toBe('default');
+  it('returns europe for Iceland coordinates (64.1, -21.9)', () => {
+    // Iceland falls within the Europe bounding box (lat 35-72, lng -25 to 45)
+    expect(detectRegion(64.1, -21.9)).toBe('europe');
   });
 
   it('returns southeast_asia for Singapore coordinates (1.35, 103.8)', () => {
