@@ -10,10 +10,10 @@
 - [ ] **ROUTE-01**: User can generate loop routes (not just out-and-back) for a requested distance
 - [ ] **ROUTE-02**: Generated route distance matches requested distance within 10% accuracy
 - [ ] **ROUTE-03**: User receives 3+ route options ranked by quality for each request
-- [ ] **ROUTE-04**: Routes are surface/terrain-aware -- preferring trails, paths, and unpaved surfaces when available
+- [x] **ROUTE-04**: Routes are surface/terrain-aware -- preferring trails, paths, and unpaved surfaces when available
 - [ ] **ROUTE-05**: User can describe desired route in natural language ("shady waterfront trail", "hilly forest run")
 - [ ] **ROUTE-06**: Each route includes a quality explanation -- why this route was chosen and what makes it good
-- [ ] **ROUTE-07**: Multi-factor trail scoring ranks routes by green space proximity, water features, surface quality, trail continuity, and scenic value
+- [x] **ROUTE-07**: Multi-factor trail scoring ranks routes by green space proximity, water features, surface quality, trail continuity, and scenic value
 
 ### Data & Discovery
 
@@ -89,8 +89,8 @@
 | ROUTE-01 | Phase 2 | Pending |
 | ROUTE-02 | Phase 2 | Pending |
 | ROUTE-03 | Phase 2 | Pending |
-| ROUTE-04 | Phase 2 | Pending |
-| ROUTE-07 | Phase 2 | Pending |
+| ROUTE-04 | Phase 2 | Complete |
+| ROUTE-07 | Phase 2 | Complete |
 | ROUTE-05 | Phase 3 | Pending |
 | ROUTE-06 | Phase 3 | Pending |
 | DATA-03 | Phase 3 | Pending |

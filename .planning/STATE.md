@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-03-25T23:57:15.086Z"
+status: Ready to execute
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-27T00:18:41.680Z"
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 4
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Every generated route should feel like a local runner recommended it -- hitting the best trails, paths, and scenic spots in any location worldwide.
-**Current focus:** Phase 01 — architecture-foundation-and-data-layer
+**Current focus:** Phase 02 — route-building-and-scoring-engine
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
+Phase: 02 (route-building-and-scoring-engine) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: Not started
 *Updated after each plan completion*
 | Phase 01 P01 | 4min | 2 tasks | 16 files |
 | Phase 01 P02 | 3min | 2 tasks | 6 files |
+| Phase 02 P01 | 35min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,9 @@ Recent decisions affecting current work:
 - [Phase 01]: OSRM normalizes to GeoJSON FeatureCollection to match ORS native format -- uniform output
 - [Phase 01]: Region profiles adjust scoring weights, not query scope -- Overpass always queries ALL highway types regardless of region
 - [Phase 01]: Relation members extracted as individual GeoJSON Features with parent relation metadata for downstream scoring
+- [Phase 02]: Trail preference weight highest at 0.30 -- directly addresses ROUTE-04 (prefer trails over roads)
+- [Phase 02]: Missing surface tags score as 0.5 neutral (not zero) to handle OSM data gaps in regions with sparse tagging
+- [Phase 02]: Region weight profiles: Japan boosts surface (reliable tagging), Europe boosts trailPreference (networks), US boosts continuity (sparse tagging)
 
 ### Pending Todos
 
@@ -77,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T23:45:15.805Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-03-27T00:18:41.676Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
