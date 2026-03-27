@@ -26,9 +26,9 @@
 ### Export & Usability
 
 - [x] **EXPORT-01**: User can export any route as a GPX file compatible with Garmin, Apple Watch, and other GPS devices
-- [ ] **EXPORT-02**: Map interface is fully responsive and usable on mobile devices
-- [ ] **EXPORT-03**: Routes display turn-by-turn waypoints on the map with distance markers
-- [ ] **EXPORT-04**: Route explanations include local context -- trail names, landmarks, surface types, scenic highlights
+- [x] **EXPORT-02**: Map interface is fully responsive and usable on mobile devices
+- [x] **EXPORT-03**: Routes display turn-by-turn waypoints on the map with distance markers
+- [x] **EXPORT-04**: Route explanations include local context -- trail names, landmarks, surface types, scenic highlights
 - [x] **EXPORT-05**: Elevation profile is displayed for each route showing climbs, descents, and total elevation gain
 
 ### Architecture
@@ -96,9 +96,9 @@
 | DATA-03 | Phase 3 | Complete |
 | DATA-04 | Phase 3 | Complete |
 | EXPORT-01 | Phase 4 | Complete |
-| EXPORT-02 | Phase 4 | Pending |
-| EXPORT-03 | Phase 4 | Pending |
-| EXPORT-04 | Phase 4 | Pending |
+| EXPORT-02 | Phase 4 | Complete |
+| EXPORT-03 | Phase 4 | Complete |
+| EXPORT-04 | Phase 4 | Complete |
 | EXPORT-05 | Phase 4 | Complete |
 | ARCH-02 | Phase 4 | Complete |
 | ARCH-03 | Phase 4 | Complete |
