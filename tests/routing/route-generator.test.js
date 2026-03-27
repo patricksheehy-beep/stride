@@ -3,6 +3,13 @@ import { featureCollection, lineString } from '@turf/helpers';
 import { eventBus } from '../../src/core/event-bus.js';
 import { store } from '../../src/core/state.js';
 
+// Mock cache module at top level (hoisted by Vitest)
+vi.mock('../../src/core/cache.js', () => ({
+  getCached: vi.fn().mockResolvedValue(null),
+  setCache: vi.fn().mockResolvedValue(undefined),
+  ROUTE_STORE: 'routes'
+}));
+
 /**
  * Build a mock GeoJSON FeatureCollection with a single LineString loop.
  */
@@ -58,13 +65,6 @@ describe('RouteGenerator', () => {
     store.isGenerating = false;
     store.currentRoute = null;
     store.trails = [];
-
-    // Mock cache module to always miss
-    vi.mock('../../src/core/cache.js', () => ({
-      getCached: vi.fn().mockResolvedValue(null),
-      setCache: vi.fn().mockResolvedValue(undefined),
-      ROUTE_STORE: 'routes'
-    }));
 
     // Dynamically import after mocks are set up
     const mod = await import('../../src/routing/route-generator.js');
@@ -324,18 +324,21 @@ describe('RouteGenerator', () => {
     });
 
     it('uses detectRegion to pick region-appropriate scoring weights', async () => {
-      // Start point in US region (California)
+      // Start point in US region (California: lat 37.4, lng -122.0)
       const generator = new RouteGenerator({
         routeBuilder: mockRouteBuilder,
         scorer: mockScorer,
         overpassAdapter: mockOverpassAdapter
       });
 
-      await generator.generate(startPoint, distanceKm);
+      const result = await generator.generate(startPoint, distanceKm);
 
-      // Scorer should have been called with candidates -- the fact that
-      // generate completes successfully means region detection worked
-      expect(mockScorer.scoreAndRank).toHaveBeenCalled();
+      // Generator creates its own scorer with region-detected weights internally.
+      // Verify generation completes and returns scored routes (proving scorer was used).
+      expect(result.routes.length).toBeGreaterThanOrEqual(1);
+      expect(result.routes[0]).toHaveProperty('score');
+      expect(result.routes[0].score).toHaveProperty('total');
+      expect(result.routes[0].score).toHaveProperty('breakdown');
     });
 
     it('combines round_trip candidates with waypoint-based candidate', async () => {
@@ -345,14 +348,14 @@ describe('RouteGenerator', () => {
         overpassAdapter: mockOverpassAdapter
       });
 
-      await generator.generate(startPoint, distanceKm);
+      const result = await generator.generate(startPoint, distanceKm);
 
+      // Verify both generation strategies were called
       expect(mockRouteBuilder.generateCandidatesViaRoundTrip).toHaveBeenCalled();
       expect(mockRouteBuilder.generateCandidateViaWaypoints).toHaveBeenCalled();
 
-      // scoreAndRank should receive both round_trip and waypoint candidates
-      const scoreAndRankArgs = mockScorer.scoreAndRank.mock.calls[0][0];
-      expect(scoreAndRankArgs.length).toBeGreaterThanOrEqual(4); // 3 round_trip + 1 waypoint
+      // Result should have 4+ candidates (3 round_trip + 1 waypoint)
+      expect(result.routes.length).toBeGreaterThanOrEqual(4);
     });
 
     it('if all round_trip candidates fail, still returns waypoint-based candidates', async () => {
