@@ -102,16 +102,41 @@ describe('RouteBuilder', () => {
 
       await builder.generateCandidatesViaRoundTrip(startPoint, 5, 3);
 
-      // Should generate count+2 = 5 attempts with seeds 0..4
-      expect(mockOrsAdapter.roundTrip).toHaveBeenCalledTimes(5);
+      // When all seeds succeed, stops after collecting count (3) candidates
+      // Each call uses a sequential seed starting from 0
+      const callCount = mockOrsAdapter.roundTrip.mock.calls.length;
+      expect(callCount).toBeGreaterThanOrEqual(3);
 
-      // Each call should use a different seed
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < callCount; i++) {
         expect(mockOrsAdapter.roundTrip).toHaveBeenCalledWith(
           startPoint,
           expect.objectContaining({ seed: i })
         );
       }
+    });
+
+    it('tries up to count+2 seeds when some fail', async () => {
+      // Make seeds 0 and 1 fail, so it must try more to get 3
+      let callIdx = 0;
+      mockOrsAdapter.roundTrip = vi.fn().mockImplementation((_start, opts) => {
+        if (opts.seed < 2) {
+          return Promise.reject(new Error('seed failed'));
+        }
+        return Promise.resolve(buildMockRoute(37.4, -122.0, 5));
+      });
+
+      const builder = new RouteBuilder({
+        orsAdapter: mockOrsAdapter,
+        engineManager: mockEngineManager,
+        scorer: mockScorer
+      });
+
+      const results = await builder.generateCandidatesViaRoundTrip(startPoint, 5, 3);
+
+      // Should have tried all 5 (count+2) seeds
+      expect(mockOrsAdapter.roundTrip).toHaveBeenCalledTimes(5);
+      // Got 3 successful from seeds 2, 3, 4
+      expect(results).toHaveLength(3);
     });
 
     it('passes distanceKm * 1000 as length (meters)', async () => {

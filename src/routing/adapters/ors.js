@@ -70,4 +70,65 @@ export class ORSAdapter {
 
     return response.json();
   }
+
+  /**
+   * Generate a round-trip loop route from a single starting point.
+   * Uses ORS round_trip parameter with seed variation for different loop shapes.
+   * Returns GeoJSON FeatureCollection.
+   *
+   * IMPORTANT: round_trip and alternative_routes are mutually exclusive in ORS.
+   * Use different seed values to generate multiple distinct loops.
+   *
+   * @param {{lat: number, lng: number}} startPoint - Loop start/end point
+   * @param {object} [options={}] - Round trip options
+   * @param {number} [options.length=5000] - Target distance in meters
+   * @param {number} [options.points=5] - Number of waypoints for loop shape (more = more circular)
+   * @param {number} [options.seed=0] - Randomization seed (different seed = different route)
+   * @returns {Promise<object>} GeoJSON FeatureCollection
+   */
+  async roundTrip(startPoint, options = {}) {
+    const { length = 5000, points = 5, seed = 0 } = options;
+
+    const body = {
+      coordinates: [[startPoint.lng, startPoint.lat]],
+      preference: 'recommended',
+      units: 'km',
+      geometry: true,
+      instructions: false,
+      options: {
+        round_trip: {
+          length: length,
+          points: points,
+          seed: seed
+        },
+        profile_params: {
+          weightings: {
+            green: { factor: 1.0 },
+            quiet: { factor: 1.0 }
+          }
+        }
+      }
+    };
+
+    const response = await fetch(
+      `${this.baseUrl}/v2/directions/foot-hiking/geojson`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': this.apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    if (response.status === 429) {
+      throw new Error('ORS rate limit exceeded');
+    }
+    if (!response.ok) {
+      throw new Error(`ORS round trip error: ${response.status}`);
+    }
+
+    return response.json();
+  }
 }
