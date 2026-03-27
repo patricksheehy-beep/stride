@@ -80,13 +80,13 @@ Plans:
   3. Routes display turn-by-turn waypoints with distance markers on the map
   4. Route detail view shows an elevation profile with climbs, descents, and total elevation gain
   5. App can be installed as a PWA on mobile home screen and loads previously generated routes without an internet connection
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md -- ORS elevation/instructions enrichment, GPX export builder, and Chart.js elevation profile
+- [ ] 04-02-PLAN.md -- Scoring Web Worker and PWA manifest/icons/offline/caching completion
+- [ ] 04-03-PLAN.md -- Route renderer (waypoints, distance markers), route info panel, mobile-responsive layout
 
 ### Phase 5: Global Validation
 **Goal**: Route quality is verified across diverse geographies worldwide, and the system automatically adapts to regional differences in OSM data
@@ -112,5 +112,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Architecture Foundation and Data Layer | 3/3 | Complete | 2026-03-25 |
 | 2. Route Building and Scoring Engine | 0/3 | Planning complete | - |
 | 3. Natural Language, Route Intelligence, and Data Enrichment | 0/3 | Planning complete | - |
-| 4. Export, Map Experience, and PWA | 0/3 | Not started | - |
+| 4. Export, Map Experience, and PWA | 0/3 | Planning complete | - |
 | 5. Global Validation | 0/2 | Not started | - |
