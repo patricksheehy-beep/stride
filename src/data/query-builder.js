@@ -35,6 +35,41 @@ const leisureTypes = ['track', 'nature_reserve'];
  * @param {number} [options.timeout=300] - Overpass query timeout in seconds
  * @returns {string} Overpass QL query string
  */
+/**
+ * Build an Overpass QL query for land-use polygons in a bounding box.
+ * Fetches parks, forests, water bodies, meadows, and other green/natural areas
+ * as polygon geometry for downstream green space scoring.
+ *
+ * @param {number[]} bbox - Bounding box as [south, west, north, east]
+ * @param {Object} [options={}] - Query options
+ * @param {number} [options.timeout=60] - Overpass query timeout in seconds (lighter than trails)
+ * @returns {string} Overpass QL query string
+ */
+export function buildLandUseQuery(bbox, options = {}) {
+  const [south, west, north, east] = bbox;
+  const timeout = options.timeout || 60;
+  const bboxStr = `${south},${west},${north},${east}`;
+
+  return `[out:json][timeout:${timeout}];
+(
+  way["leisure"~"^(park|garden|nature_reserve)$"]
+     (${bboxStr});
+  relation["leisure"~"^(park|garden|nature_reserve)$"]
+           (${bboxStr});
+  way["landuse"~"^(forest|grass|meadow|recreation_ground)$"]
+     (${bboxStr});
+  relation["landuse"~"^(forest|grass|meadow|recreation_ground)$"]
+           (${bboxStr});
+  way["natural"~"^(water|wood|grassland|wetland)$"]
+     (${bboxStr});
+  relation["natural"~"^(water|wood|grassland|wetland)$"]
+           (${bboxStr});
+  way["waterway"~"^(river|stream|canal)$"]
+     (${bboxStr});
+);
+out body geom;`;
+}
+
 export function buildTrailQuery(bbox, options = {}) {
   const [south, west, north, east] = bbox;
   const timeout = options.timeout || 300;

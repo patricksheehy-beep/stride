@@ -3,7 +3,8 @@
  * Fetches trail data using comprehensive queries, normalizes responses
  * to standard GeoJSON FeatureCollection, and caches results in IndexedDB.
  */
-import { buildTrailQuery } from '../query-builder.js';
+import { buildTrailQuery, buildLandUseQuery } from '../query-builder.js';
+import { normalizeToPolygons } from '../enrichment.js';
 import { config } from '../../core/config.js';
 import { getCached, setCache } from '../../core/cache.js';
 import { eventBus } from '../../core/event-bus.js';
@@ -129,5 +130,68 @@ export class OverpassAdapter {
     });
 
     return geojson;
+  }
+
+  /**
+   * Fetch land-use polygon data for a bounding box.
+   * Returns parks, forests, water bodies, and other green/natural areas
+   * as Polygon/MultiPolygon features for green space scoring.
+   *
+   * @param {number[]} bbox - Bounding box as [south, west, north, east]
+   * @param {Object} [options={}] - Query options passed to buildLandUseQuery
+   * @returns {Promise<Object>} GeoJSON FeatureCollection of Polygon/MultiPolygon features
+   */
+  async fetchLandUse(bbox, options = {}) {
+    const cacheKey = `landuse:${bbox.join(',')}`;
+    const LAND_USE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days -- land-use changes rarely
+
+    // Check cache first
+    const cached = await getCached('trails', cacheKey);
+    if (cached) {
+      eventBus.emit('data:cache-hit', { key: cacheKey });
+      return cached;
+    }
+
+    // Build the land-use Overpass QL query
+    const query = buildLandUseQuery(bbox, options);
+
+    // Try primary endpoint, fall back to secondary
+    let response;
+    try {
+      response = await fetch(this.endpoint, {
+        method: 'POST',
+        body: `data=${encodeURIComponent(query)}`,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+      if (!response.ok) {
+        throw new Error(`Overpass error: ${response.status}`);
+      }
+    } catch (primaryError) {
+      // Try fallback endpoint
+      response = await fetch(this.fallbackEndpoint, {
+        method: 'POST',
+        body: `data=${encodeURIComponent(query)}`,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+      if (!response.ok) {
+        throw new Error(`Overpass fallback error: ${response.status}`);
+      }
+    }
+
+    // Parse, normalize to GeoJSON, then convert to polygons only
+    const data = await response.json();
+    const geojson = normalizeOverpassToGeoJSON(data);
+    const polygons = normalizeToPolygons(geojson);
+
+    // Cache the polygon-only result with 7-day TTL
+    await setCache('trails', cacheKey, polygons, LAND_USE_TTL);
+
+    // Emit event with results summary
+    eventBus.emit('data:landuse-loaded', {
+      featureCount: polygons.features.length,
+      bbox
+    });
+
+    return polygons;
   }
 }
