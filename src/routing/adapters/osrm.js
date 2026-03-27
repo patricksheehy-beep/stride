@@ -28,20 +28,29 @@ export function normalizeOSRMResponse(data) {
 }
 
 export class OSRMAdapter {
+  static PROFILES = {
+    run: 'foot',
+    walk: 'foot',
+    hike: 'foot',
+    bike: 'bike'
+  };
+
   constructor() {
     this.baseUrl = config.osrmBaseUrl;
+    this._activity = 'run';
   }
 
-  /**
-   * Build the OSRM request URL for foot routing.
-   * Coordinates are formatted as lng,lat pairs separated by semicolons.
-   *
-   * @param {Array<{lat: number, lng: number}>} waypoints
-   * @returns {string} OSRM request URL
-   */
+  setActivity(activity) {
+    this._activity = activity || 'run';
+  }
+
+  get profile() {
+    return OSRMAdapter.PROFILES[this._activity] || 'foot';
+  }
+
   buildUrl(waypoints) {
     const coords = waypoints.map(p => `${p.lng},${p.lat}`).join(';');
-    return `${this.baseUrl}/route/v1/foot/${coords}?overview=full&geometries=geojson&steps=false`;
+    return `${this.baseUrl}/route/v1/${this.profile}/${coords}?overview=full&geometries=geojson&steps=false`;
   }
 
   /**

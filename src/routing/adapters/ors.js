@@ -9,9 +9,25 @@ export class ORSAdapter {
   /**
    * @param {string} apiKey - ORS API key
    */
+  static PROFILES = {
+    run: 'foot-hiking',
+    walk: 'foot-walking',
+    hike: 'foot-hiking',
+    bike: 'cycling-regular'
+  };
+
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.baseUrl = config.orsBaseUrl;
+    this._activity = 'run';
+  }
+
+  setActivity(activity) {
+    this._activity = activity || 'run';
+  }
+
+  get profile() {
+    return ORSAdapter.PROFILES[this._activity] || 'foot-hiking';
   }
 
   /**
@@ -52,7 +68,7 @@ export class ORSAdapter {
   async route(waypoints) {
     const body = this.buildRequestBody(waypoints);
     const response = await fetch(
-      `${this.baseUrl}/v2/directions/foot-hiking/geojson`,
+      `${this.baseUrl}/v2/directions/${this.profile}/geojson`,
       {
         method: 'POST',
         headers: {
@@ -115,7 +131,7 @@ export class ORSAdapter {
     };
 
     const response = await fetch(
-      `${this.baseUrl}/v2/directions/foot-hiking/geojson`,
+      `${this.baseUrl}/v2/directions/${this.profile}/geojson`,
       {
         method: 'POST',
         headers: {

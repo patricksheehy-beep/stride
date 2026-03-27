@@ -8,8 +8,16 @@
  * @param {string} service - Service identifier (e.g., 'ors')
  * @returns {string|null} The API key or null if not set
  */
+// Map service names to the localStorage keys used by the original prototype
+const KEY_MAP = {
+  ors: 'stride_ors_key',
+  key: 'stride_api_key',
+  claude: 'stride_api_key'
+};
+
 export function getApiKey(service) {
-  const key = localStorage.getItem(`stride_api_${service}`);
+  const storageKey = KEY_MAP[service] || `stride_api_${service}`;
+  const key = localStorage.getItem(storageKey);
   return key || null;
 }
 
@@ -19,7 +27,8 @@ export function getApiKey(service) {
  * @param {string} key - The API key value
  */
 export function setApiKey(service, key) {
-  localStorage.setItem(`stride_api_${service}`, key);
+  const storageKey = KEY_MAP[service] || `stride_api_${service}`;
+  localStorage.setItem(storageKey, key);
 }
 
 /**

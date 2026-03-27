@@ -37,6 +37,212 @@ html, body {
   min-height: 60vh;
 }
 
+/* ---- Controls Panel ---- */
+
+#controls-container {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.controls-panel {
+  background: rgba(17, 17, 17, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 280px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.app-title {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: #E8C547;
+  margin-bottom: 0.25rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.control-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+}
+
+.control-input {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  color: #F5F5F5;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.control-input:focus {
+  border-color: #E8C547;
+}
+
+.control-hint {
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Route type + activity type selectors */
+.route-type-selector,
+.activity-type-selector {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.type-btn {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 0.4rem 0.25rem;
+  color: #888;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.type-btn:hover { border-color: #555; color: #ccc; }
+.type-btn--active { border-color: #E8C547; color: #F5F5F5; background: #1e1e1e; }
+
+.generate-btn {
+  background: #E8C547;
+  color: #0A0A0A;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.generate-btn:hover { opacity: 0.9; }
+.generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.settings-toggle {
+  background: none;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #666;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.7rem;
+  padding: 0.35rem;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.settings-toggle:hover { border-color: #555; color: #999; }
+
+.settings-panel { margin-top: 0.25rem; }
+
+.save-keys-btn {
+  background: #333;
+  color: #F5F5F5;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.save-keys-btn:hover { background: #444; }
+
+.vibe-selector { display: flex; gap: 0.25rem; }
+
+/* ---- Map Markers ---- */
+
+.marker-pin {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.marker-pin--start { background: #E8C547; color: #0A0A0A; }
+.marker-pin--dest { background: #60A5FA; color: #0A0A0A; }
+
+.turn-marker { background: transparent !important; border: none !important; }
+.turn-pin {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #E8C547;
+  color: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.65rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  border: 2px solid #0A0A0A;
+}
+
+.distance-marker { background: transparent !important; border: none !important; }
+.distance-marker span {
+  background: rgba(17, 17, 17, 0.85);
+  color: #E8C547;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  white-space: nowrap;
+}
+
+/* ---- Mobile responsive ---- */
+
+@media (max-width: 640px) {
+  #controls-container {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0;
+  }
+
+  .controls-panel {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .app-title { font-size: 1.2rem; }
+}
+
 /* ---- Route Panel ---- */
 
 #route-panel-container {
@@ -75,6 +281,139 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* ---- Route Header (detail view) ---- */
+
+.route-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.back-btn {
+  background: none;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #888;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.back-btn:hover { border-color: #E8C547; color: #E8C547; }
+
+.route-title {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #E8C547;
+  margin: 0;
+}
+
+/* ---- Route Selector ---- */
+
+.route-selector {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.route-tab {
+  flex: 1;
+  min-width: 0;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  color: #888;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.route-tab:hover {
+  border-color: #555;
+  color: #ccc;
+}
+
+.route-tab--active {
+  border-color: #E8C547;
+  color: #F5F5F5;
+  background: #1e1e1e;
+}
+
+.route-tab-label {
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.route-tab-detail {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+/* ---- Segment Breakdown ---- */
+
+.segments-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.segment {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #222;
+}
+
+.segment:last-child { border-bottom: none; }
+
+.segment-letter {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  background: #E8C547;
+  color: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.6rem;
+}
+
+.segment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.segment-name {
+  font-size: 0.8rem;
+  color: #F5F5F5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.segment-dist {
+  font-size: 0.65rem;
+  color: #666;
 }
 
 /* ---- Route Stats ---- */

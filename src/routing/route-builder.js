@@ -85,10 +85,10 @@ export class RouteBuilder {
    * @param {number} targetDistanceKm - Target loop distance in kilometers
    * @returns {Array<{lat: number, lng: number}>} Array of 4 snapped waypoints
    */
-  buildLoopWaypoints(startPoint, trails, targetDistanceKm) {
+  buildLoopWaypoints(startPoint, trails, targetDistanceKm, { bearingOffset = 0 } = {}) {
     const radius = targetDistanceKm / (2 * Math.PI);
     const numPoints = 4;
-    const bearings = [0, 90, 180, 270];
+    const bearings = [0 + bearingOffset, 90 + bearingOffset, 180 + bearingOffset, 270 + bearingOffset];
     const waypoints = [];
 
     const startTurfPoint = point([startPoint.lng, startPoint.lat]);
@@ -156,14 +156,137 @@ export class RouteBuilder {
    * @param {number} distanceKm - Target distance in kilometers
    * @returns {Promise<{route: object, engine: string}>} Routing result
    */
-  async generateCandidateViaWaypoints(startPoint, trailData, distanceKm) {
-    const waypoints = this.buildLoopWaypoints(startPoint, trailData, distanceKm);
+  /**
+   * Generate a route candidate using waypoint-based trail forcing with distance refinement.
+   */
+  async generateCandidateViaWaypoints(startPoint, trailData, distanceKm, { bearingOffset = 0, routeType = 'loop', destination = null } = {}) {
+    if (routeType === 'out-and-back') {
+      return this._generateOutAndBack(startPoint, trailData, distanceKm, { bearingOffset });
+    }
+    if (routeType === 'point-to-point' && destination) {
+      return this._generatePointToPoint(startPoint, destination, trailData, { bearingOffset });
+    }
 
-    // Build full waypoint array: [start, wp1, wp2, wp3, wp4, start]
-    const fullWaypoints = [startPoint, ...waypoints, startPoint];
+    let adjustedDistance = distanceKm;
+    let bestResult = null;
+    let bestError = Infinity;
 
+    for (let iteration = 0; iteration < 3; iteration++) {
+      const waypoints = this.buildLoopWaypoints(startPoint, trailData, adjustedDistance, { bearingOffset });
+      const fullWaypoints = [startPoint, ...waypoints, startPoint];
+
+      const result = await this.engineManager.route(fullWaypoints);
+      const routeGeoJSON = result.route || result;
+
+      const feature = routeGeoJSON.features?.[0] || routeGeoJSON;
+      const actualKm = turfLength(feature, { units: 'kilometers' });
+      const error = Math.abs(actualKm - distanceKm) / distanceKm;
+
+      if (error < bestError) {
+        bestError = error;
+        bestResult = result;
+      }
+
+      if (error <= 0.10) {
+        return result;
+      }
+
+      const ratio = distanceKm / actualKm;
+      adjustedDistance = adjustedDistance * ratio;
+    }
+
+    return bestResult;
+  }
+
+  /**
+   * Generate an out-and-back route: run out along a trail to the halfway point, then return.
+   * Routes to a single far waypoint on a trail, then back to start on the same path.
+   */
+  async _generateOutAndBack(startPoint, trailData, distanceKm, { bearingOffset = 0 }) {
+    const halfDistanceKm = distanceKm / 2;
+    let adjustedHalf = halfDistanceKm;
+    let bestResult = null;
+    let bestError = Infinity;
+
+    for (let iteration = 0; iteration < 3; iteration++) {
+      // Place a single waypoint at the target half-distance along the best bearing
+      const bearing = bearingOffset; // Single direction
+      const startTurfPoint = point([startPoint.lng, startPoint.lat]);
+      const farPoint = turfDestination(startTurfPoint, adjustedHalf, bearing, { units: 'kilometers' });
+      const snapped = this._snapToNearestTrail(farPoint, trailData);
+
+      // Route: start → far waypoint → start (same path back)
+      const fullWaypoints = [startPoint, snapped, startPoint];
+      const result = await this.engineManager.route(fullWaypoints);
+      const routeGeoJSON = result.route || result;
+
+      const feature = routeGeoJSON.features?.[0] || routeGeoJSON;
+      const actualKm = turfLength(feature, { units: 'kilometers' });
+      const error = Math.abs(actualKm - distanceKm) / distanceKm;
+
+      if (error < bestError) {
+        bestError = error;
+        bestResult = result;
+      }
+
+      if (error <= 0.10) {
+        return result;
+      }
+
+      const ratio = halfDistanceKm / (actualKm / 2);
+      adjustedHalf = adjustedHalf * ratio;
+    }
+
+    return bestResult;
+  }
+
+  /**
+   * Generate a point-to-point route from start to destination via trail waypoints.
+   * Places intermediate waypoints between start and destination, snapped to trails.
+   */
+  async _generatePointToPoint(startPoint, destination, trailData, { bearingOffset = 0 }) {
+    // Place 2 intermediate waypoints between start and destination, offset to find trails
+    const midLat = (startPoint.lat + destination.lat) / 2;
+    const midLng = (startPoint.lng + destination.lng) / 2;
+    const midPoint = point([midLng, midLat]);
+
+    // Offset the midpoint perpendicular to the direct line to explore different trail paths
+    const directBearing = this._bearing(startPoint, destination);
+    const perpBearing = directBearing + 90 + bearingOffset;
+    const totalDistKm = this._haversineKm(startPoint, destination);
+    const offsetDist = Math.max(0.3, totalDistKm * 0.15); // 15% of direct distance, min 300m
+
+    const offsetPoint = turfDestination(midPoint, offsetDist, perpBearing, { units: 'kilometers' });
+    const snapped = this._snapToNearestTrail(offsetPoint, trailData);
+
+    const fullWaypoints = [startPoint, snapped, destination];
     const result = await this.engineManager.route(fullWaypoints);
     return result;
+  }
+
+  /**
+   * Calculate bearing from point A to point B in degrees.
+   */
+  _bearing(a, b) {
+    const dLng = (b.lng - a.lng) * Math.PI / 180;
+    const lat1 = a.lat * Math.PI / 180;
+    const lat2 = b.lat * Math.PI / 180;
+    const y = Math.sin(dLng) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  }
+
+  /**
+   * Haversine distance in km between two points.
+   */
+  _haversineKm(a, b) {
+    const R = 6371;
+    const dLat = (b.lat - a.lat) * Math.PI / 180;
+    const dLng = (b.lng - a.lng) * Math.PI / 180;
+    const sinLat = Math.sin(dLat / 2);
+    const sinLng = Math.sin(dLng / 2);
+    const h = sinLat * sinLat + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * sinLng * sinLng;
+    return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
   }
 
   /**

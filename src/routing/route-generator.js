@@ -140,7 +140,13 @@ export class RouteGenerator {
         return cached;
       }
 
-      // 3. Detect region and get appropriate scoring weights
+      // 3. Set activity on routing adapters (run/hike/bike)
+      const activity = options.activity || 'run';
+      if (this.routeBuilder.orsAdapter?.setActivity) this.routeBuilder.orsAdapter.setActivity(activity);
+      if (this.routeBuilder.engineManager?.orsAdapter?.setActivity) this.routeBuilder.engineManager.orsAdapter.setActivity(activity);
+      if (this.routeBuilder.engineManager?.osrmAdapter?.setActivity) this.routeBuilder.engineManager.osrmAdapter.setActivity(activity);
+
+      // 3a. Detect region and get appropriate scoring weights
       const region = detectRegion(startPoint.lat, startPoint.lng);
       const weights = getWeightsForRegion(region);
 
@@ -176,31 +182,27 @@ export class RouteGenerator {
         // Land-use fetch failed; green space scoring will use neutral base
       }
 
-      // 5. Generate candidates via both strategies
+      // 5. Generate candidates via waypoint-based trail forcing
+      //    Each candidate uses a different bearing offset to explore different trail paths
       const candidates = [];
+      const routeType = options.routeType || 'loop';
+      const destination = options.destination || null;
+      const bearingOffsets = routeType === 'point-to-point'
+        ? [0, 45, -45] // 3 different path offsets between A and B
+        : routeType === 'out-and-back'
+          ? [0, 90, 180] // 3 different directions
+          : [0, 30, 60]; // 3 different rotations for loops
 
-      // 5a. Round trip candidates
-      try {
-        const roundTripCandidates = await this.routeBuilder.generateCandidatesViaRoundTrip(
-          startPoint, distanceKm, 3
-        );
-        for (const candidate of roundTripCandidates) {
-          candidates.push({ route: candidate, trailData, landUseData });
+      for (const offset of bearingOffsets) {
+        try {
+          const waypointResult = await this.routeBuilder.generateCandidateViaWaypoints(
+            startPoint, trailData, distanceKm, { bearingOffset: offset, routeType, destination }
+          );
+          const waypointRoute = waypointResult.route || waypointResult;
+          candidates.push({ route: waypointRoute, trailData, landUseData });
+        } catch {
+          // This bearing variation failed; continue with others
         }
-      } catch {
-        // Round trip generation failed; continue with waypoint strategy
-      }
-
-      // 5b. Waypoint-based candidate
-      try {
-        const waypointResult = await this.routeBuilder.generateCandidateViaWaypoints(
-          startPoint, trailData, distanceKm
-        );
-        // waypointResult is { route, engine } from EngineManager
-        const waypointRoute = waypointResult.route || waypointResult;
-        candidates.push({ route: waypointRoute, trailData, landUseData });
-      } catch {
-        // Waypoint generation failed; continue with what we have
       }
 
       // 6. If no candidates at all, throw

@@ -82,20 +82,20 @@ export function renderRoute(map, routeGeoJSON, options = {}) {
  * @param {number} [intervalKm=1] - Interval between markers in km
  * @returns {Array<L.Marker>} Array of distance marker instances
  */
-export function addDistanceMarkers(map, routeFeature, intervalKm = 1) {
-  const totalKm = turfLength(routeFeature, { units: 'kilometers' });
+export function addDistanceMarkers(map, routeFeature, intervalMi = 1) {
+  const totalMi = turfLength(routeFeature, { units: 'miles' });
   const markers = [];
 
-  if (totalKm < intervalKm) return markers;
+  if (totalMi < intervalMi) return markers;
 
-  for (let km = intervalKm; km < totalKm; km += intervalKm) {
-    const point = turfAlong(routeFeature, km, { units: 'kilometers' });
+  for (let mi = intervalMi; mi < totalMi; mi += intervalMi) {
+    const point = turfAlong(routeFeature, mi, { units: 'miles' });
     const [lng, lat] = point.geometry.coordinates;
 
     const icon = L.divIcon({
       className: 'distance-marker',
-      html: `<span>${km}</span>`,
-      iconSize: [24, 24]
+      html: `<span>${mi} mi</span>`,
+      iconSize: [32, 20]
     });
 
     const marker = L.marker([lat, lng], { icon });
@@ -122,19 +122,24 @@ export function addDistanceMarkers(map, routeFeature, intervalKm = 1) {
  */
 export function addTurnMarkers(map, turnPoints) {
   const markers = [];
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-  for (const point of turnPoints) {
-    const marker = L.circleMarker([point.lat, point.lng], {
-      radius: 6,
-      color: '#E8C547',
-      fillColor: '#0A0A0A',
-      fillOpacity: 1,
-      weight: 2
+  for (let i = 0; i < turnPoints.length; i++) {
+    const point = turnPoints[i];
+    const letter = letters[i % 26];
+    const cumulativeMi = point.distance ? (point.distance / 1609.34).toFixed(1) : '';
+
+    const icon = L.divIcon({
+      className: 'turn-marker',
+      html: `<div class="turn-pin">${letter}</div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
     });
 
-    marker.bindTooltip(point.instruction || '');
+    const marker = L.marker([point.lat, point.lng], { icon });
+    const tooltip = `${letter}: ${point.instruction || ''}${cumulativeMi ? ` (${cumulativeMi} mi)` : ''}`;
+    marker.bindTooltip(tooltip);
 
-    // Add to existing route layer group if available
     if (map._strideRouteGroup) {
       map._strideRouteGroup.addLayer(marker);
     } else {
