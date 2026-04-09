@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stride - Offline</title>
+  <style>
+    body { background: #0A0A0A; color: #E8C547; font-family: 'DM Sans', system-ui, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; margin: 0; }
+    .offline-content { max-width: 400px; padding: 2rem; }
+    h1 { font-family: 'Instrument Serif', serif; font-size: 2rem; margin-bottom: 1rem; }
+    p { color: #888; line-height: 1.6; }
+    .retry-btn { margin-top: 2rem; padding: 0.75rem 2rem; background: #E8C547; color: #0A0A0A; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="offline-content">
+    <h1>Stride</h1>
+    <p>You are currently offline. Previously generated routes are available in your cache. Connect to the internet to generate new routes.</p>
+    <button class="retry-btn" onclick="window.location.reload()">Retry Connection</button>
+  </div>
+</body>
+</html>

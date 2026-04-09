@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <title>Stride - AI Running Route Generator</title>
+  <link rel="apple-touch-icon" href="/stride/icons/icon-192.png">
+  <script type="module" crossorigin src="/stride/assets/index-qSw0fKXd.js"></script>
+  <link rel="stylesheet" crossorigin href="/stride/assets/index-BM18qbN-.css">
+<link rel="manifest" href="/stride/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/stride/registerSW.js"></script></head>
+<body>
+  <div id="app">
+    <div id="map"></div>
+    <div id="controls-container">
+      <div class="controls-panel">
+        <h1 class="app-title">Stride</h1>
+        <div class="control-group">
+          <label class="control-label">Activity</label>
+          <div class="activity-type-selector" id="activity-type-selector">
+            <button class="type-btn type-btn--active" data-activity="run">Run</button>
+            <button class="type-btn" data-activity="walk">Walk</button>
+            <button class="type-btn" data-activity="hike">Hike</button>
+            <button class="type-btn" data-activity="bike">Bike</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Route Type</label>
+          <div class="route-type-selector" id="route-type-selector">
+            <button class="type-btn type-btn--active" data-type="loop">Loop</button>
+            <button class="type-btn" data-type="out-and-back">Out & Back</button>
+            <button class="type-btn" data-type="point-to-point">Point to Point</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Vibe</label>
+          <div class="vibe-selector" id="vibe-selector">
+            <button class="type-btn type-btn--active" data-vibe="general">General</button>
+            <button class="type-btn" data-vibe="nature">Nature</button>
+            <button class="type-btn" data-vibe="sightseeing">Sightseeing</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Starting Point</label>
+          <div class="start-point-row">
+            <button class="type-btn type-btn--active" id="use-gps-btn" data-start="gps">Use My Location</button>
+            <button class="type-btn" id="use-manual-btn" data-start="manual">Enter Location</button>
+          </div>
+          <div id="manual-location-group" style="display:none">
+            <input type="text" id="location-input" class="control-input" placeholder="City, address, or place name...">
+            <button class="search-location-btn" id="search-location-btn">Search</button>
+          </div>
+          <p class="control-hint" id="start-hint"></p>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="distance-input">Distance (miles)</label>
+          <input type="number" id="distance-input" class="control-input" value="3" min="0.5" max="30" step="0.5">
+        </div>
+        <div class="control-group" id="destination-group" style="display:none">
+          <label class="control-label">Destination</label>
+          <p class="control-hint" id="destination-hint">Tap the map to set your destination</p>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="description-input">Customize (optional)</label>
+          <input type="text" id="description-input" class="control-input" placeholder="waterfront, shady, flat...">
+        </div>
+        <button class="generate-btn" id="generate-btn">Generate Routes</button>
+        <button class="settings-toggle" id="settings-toggle">API Keys</button>
+        <div class="settings-panel" id="settings-panel" style="display:none">
+          <div class="control-group">
+            <label class="control-label" for="ors-key-input">ORS API Key</label>
+            <input type="password" id="ors-key-input" class="control-input" placeholder="Enter ORS key...">
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="claude-key-input">Claude API Key (optional)</label>
+            <input type="password" id="claude-key-input" class="control-input" placeholder="Enter Claude key...">
+          </div>
+          <button class="save-keys-btn" id="save-keys-btn">Save Keys</button>
+        </div>
+      </div>
+    </div>
+    <div id="route-panel-container"></div>
+  </div>
+</body>
+</html>
