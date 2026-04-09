@@ -176,6 +176,23 @@ html, body {
 
 .vibe-selector { display: flex; gap: 0.25rem; }
 
+.start-point-row { display: flex; gap: 0.25rem; margin-bottom: 0.35rem; }
+
+#manual-location-group { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.search-location-btn {
+  background: #333;
+  color: #F5F5F5;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.search-location-btn:hover { background: #444; }
+
 /* ---- Map Markers ---- */
 
 .marker-pin {

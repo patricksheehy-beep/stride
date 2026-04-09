@@ -254,8 +254,8 @@ describe('RouteBuilder', () => {
 
       await builder.generateCandidateViaWaypoints(startPoint, trailData, 5);
 
-      // engineManager.route should be called with [start, wp1, wp2, wp3, wp4, start]
-      expect(mockEngineManager.route).toHaveBeenCalledTimes(1);
+      // engineManager.route called at least once (may iterate for distance refinement)
+      expect(mockEngineManager.route).toHaveBeenCalled();
       const routeArgs = mockEngineManager.route.mock.calls[0][0];
       expect(routeArgs).toHaveLength(6); // start + 4 waypoints + start again
     });

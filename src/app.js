@@ -57,11 +57,15 @@ function init() {
   });
 
   // Listen for route generation requests from UI components
-  eventBus.on('route:generate-requested', async ({ startPoint, distanceKm, userDescription, routeType, activity, destination }) => {
+  eventBus.on('route:generate-requested', async ({ startPoint, distanceKm, userDescription, routeType, activity, vibe, destination }) => {
+    const btn = document.getElementById('generate-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
     try {
-      await routeGenerator.generate(startPoint, distanceKm, { userDescription, routeType, activity, destination });
+      await routeGenerator.generate(startPoint, distanceKm, { userDescription, routeType, activity, vibe, destination });
     } catch (err) {
       console.error('Route generation failed:', err);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Generate Routes'; }
     }
   });
 
@@ -251,7 +255,8 @@ function init() {
         destMarker = L.marker([lat, lng], {
           icon: L.divIcon({ className: 'dest-marker', html: '<div class="marker-pin marker-pin--dest">B</div>', iconSize: [30, 30], iconAnchor: [15, 30] })
         }).addTo(mapInstance);
-        destHint.textContent = `Destination: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        _reverseGeocode(lat, lng).then(name => { destHint.textContent = `Destination: ${name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`}`; });
+        destHint.textContent = `Destination: locating...`;
       } else {
         // First click (or non-P2P): set start
         startPoint = { lat, lng };
@@ -261,6 +266,8 @@ function init() {
         startMarker = L.marker([lat, lng], {
           icon: L.divIcon({ className: 'start-marker', html: '<div class="marker-pin marker-pin--start">A</div>', iconSize: [30, 30], iconAnchor: [15, 30] })
         }).addTo(mapInstance);
+        startHint.textContent = 'Locating...';
+        _reverseGeocode(lat, lng).then(name => { startHint.textContent = name; });
         if (selectedRouteType === 'point-to-point') {
           destHint.textContent = 'Now tap the map to set your destination';
         }
@@ -275,18 +282,9 @@ function init() {
   if (generateBtn) {
     generateBtn.addEventListener('click', () => {
       if (!startPoint) {
-        // Try geolocation
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (pos) => {
-              startPoint = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-              _emitGenerate();
-            },
-            () => alert('Tap the map to set your starting point')
-          );
-          return;
-        }
-        alert('Tap the map to set your starting point');
+        startHint.textContent = 'Set a starting point first — use GPS or enter a location';
+        startHint.style.color = '#F87171';
+        setTimeout(() => { startHint.style.color = ''; }, 3000);
         return;
       }
       _emitGenerate();
@@ -303,21 +301,112 @@ function init() {
       userDescription: userDescription || undefined,
       routeType: selectedRouteType,
       activity: selectedActivity,
+      vibe: selectedVibe,
       destination: selectedRouteType === 'point-to-point' ? destinationPoint : undefined
     });
   }
 
-  // Try auto-locating on load
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        startPoint = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        const mapInst = getMap();
-        if (mapInst) mapInst.setView([startPoint.lat, startPoint.lng], 14);
-      },
-      () => {} // User denied — they'll tap the map
-    );
+  // Starting point mode: GPS or manual
+  let startMode = 'gps';
+  const useGpsBtn = document.getElementById('use-gps-btn');
+  const useManualBtn = document.getElementById('use-manual-btn');
+  const manualLocationGroup = document.getElementById('manual-location-group');
+  const locationInput = document.getElementById('location-input');
+  const searchLocationBtn = document.getElementById('search-location-btn');
+  const startHint = document.getElementById('start-hint');
+
+  function _setStartFromGps() {
+    if (navigator.geolocation) {
+      startHint.textContent = 'Locating...';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          startPoint = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          const mapInst = getMap();
+          if (mapInst) mapInst.setView([startPoint.lat, startPoint.lng], 14);
+          if (startMarker) mapInst.removeLayer(startMarker);
+          startMarker = L.marker([startPoint.lat, startPoint.lng], {
+            icon: L.divIcon({ className: 'start-marker', html: '<div class="marker-pin marker-pin--start">A</div>', iconSize: [30, 30], iconAnchor: [15, 30] })
+          }).addTo(mapInst);
+          startHint.textContent = 'Locating...';
+          _reverseGeocode(startPoint.lat, startPoint.lng).then(name => { startHint.textContent = name; });
+        },
+        () => { startHint.textContent = 'Location denied — tap the map or enter manually'; }
+      );
+    } else {
+      startHint.textContent = 'GPS not available — tap the map or enter manually';
+    }
   }
+
+  if (useGpsBtn) {
+    useGpsBtn.addEventListener('click', () => {
+      startMode = 'gps';
+      useGpsBtn.classList.add('type-btn--active');
+      useManualBtn.classList.remove('type-btn--active');
+      manualLocationGroup.style.display = 'none';
+      _setStartFromGps();
+    });
+  }
+
+  if (useManualBtn) {
+    useManualBtn.addEventListener('click', () => {
+      startMode = 'manual';
+      useManualBtn.classList.add('type-btn--active');
+      useGpsBtn.classList.remove('type-btn--active');
+      manualLocationGroup.style.display = 'block';
+      startHint.textContent = 'Enter a location or tap the map';
+    });
+  }
+
+  if (searchLocationBtn) {
+    searchLocationBtn.addEventListener('click', async () => {
+      const query = locationInput?.value?.trim();
+      if (!query) return;
+      searchLocationBtn.textContent = 'Searching...';
+      try {
+        const resp = await fetch(`${config.nominatimEndpoint}/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+        const results = await resp.json();
+        if (results.length > 0) {
+          const r = results[0];
+          startPoint = { lat: parseFloat(r.lat), lng: parseFloat(r.lon) };
+          const mapInst = getMap();
+          if (mapInst) mapInst.setView([startPoint.lat, startPoint.lng], 14);
+          if (startMarker) mapInst.removeLayer(startMarker);
+          startMarker = L.marker([startPoint.lat, startPoint.lng], {
+            icon: L.divIcon({ className: 'start-marker', html: '<div class="marker-pin marker-pin--start">A</div>', iconSize: [30, 30], iconAnchor: [15, 30] })
+          }).addTo(mapInst);
+          startHint.textContent = r.display_name?.split(',').slice(0, 2).join(',');
+        } else {
+          startHint.textContent = 'Location not found — try a different search';
+        }
+      } catch {
+        startHint.textContent = 'Search failed — try again or tap the map';
+      }
+      searchLocationBtn.textContent = 'Search';
+    });
+
+    // Enter key triggers search
+    if (locationInput) {
+      locationInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') searchLocationBtn.click();
+      });
+    }
+  }
+
+  async function _reverseGeocode(lat, lng) {
+    try {
+      const resp = await fetch(`${config.nominatimEndpoint}/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data = await resp.json();
+      const addr = data.address || {};
+      const name = addr.city || addr.town || addr.village || addr.suburb || addr.county || '';
+      const state = addr.state || addr.country || '';
+      return name && state ? `${name}, ${state}` : data.display_name?.split(',').slice(0, 2).join(',') || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    } catch {
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    }
+  }
+
+  // Auto-locate on load
+  _setStartFromGps();
 
   console.log('Stride ready');
   eventBus.emit('app:initialized');

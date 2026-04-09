@@ -89,7 +89,11 @@ export class RoutePanel {
     this._backBtn.addEventListener('click', () => this._showListView());
 
     // Subscribe to route events
-    eventBus.on('route:generation-complete', (detail) => this.update(detail));
+    eventBus.on('route:generation-complete', (detail) => {
+      this._vibe = detail.vibe || 'general';
+      this._activity = detail.activity || this._activity;
+      this.update(detail);
+    });
     eventBus.on('route:generation-started', () => this.showLoading());
     eventBus.on('route:generation-failed', (detail) => this.showError(detail.error));
     eventBus.on('route:activity-changed', (activity) => { this._activity = activity; });
